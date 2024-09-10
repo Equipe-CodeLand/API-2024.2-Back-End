@@ -1,5 +1,3 @@
-modelo de dados api
-
 -- Tabela de Usuários
 CREATE TABLE User (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,8 +37,8 @@ CREATE TABLE Parameter (
   typeParameterId INT,
   factor FLOAT NOT NULL,
   offset FLOAT NOT NULL,
-  minValue FLOAT NOT NULL,
-  maxValue FLOAT NOT NULL,
+  valMin FLOAT NOT NULL,
+  valMax FLOAT NOT NULL,
   createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (stationId) REFERENCES Station(id),
