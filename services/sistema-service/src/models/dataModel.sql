@@ -60,11 +60,11 @@ CREATE TABLE Alerta (
 -- Tabela de Notificações
 CREATE TABLE Notificacao (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  ocorrenciaId INT NOT NULL,
+  alertaId INT NOT NULL,
   parametroId INT NOT NULL,
   dataNotificacao DATETIME NOT NULL,
   mensagem VARCHAR(255) NOT NULL,
   FOREIGN KEY (mensagem) REFERENCES Alerta(mensagemAlerta),
-  FOREIGN KEY (ocorrenciaId) REFERENCES Ocorrencia(id),
+  FOREIGN KEY (alertaId) REFERENCES Alerta(id),
   FOREIGN KEY (parametroId) REFERENCES Parametro(id)
 );
