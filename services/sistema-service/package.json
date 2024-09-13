@@ -4,15 +4,17 @@
   "main": "app.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "start": "tsc && node dist/app/app.js",
+    "dev": "ts-node src/app/app.ts"
   },
   "author": "Equipe Codeland",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "express": "^4.19.2",
+    "mysql2": "^3.11.2",
     "nodemon": "^3.1.4",
+    "reflect-metadata": "^0.2.2",
     "sistema-service": "file:"
   },
   "devDependencies": {
