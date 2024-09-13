@@ -41,15 +41,15 @@ CREATE TABLE Parametro (
   FOREIGN KEY (estacaoId) REFERENCES Estacao(id)
 );
 
--- Tabela de Ocorrências (Alertas)
+-- Tabela de Alertas
 CREATE TABLE Alerta (
   id INT AUTO_INCREMENT PRIMARY KEY,
   estacaoId INT,
   parametroId INT,
   mensagemAlerta VARCHAR(255) NOT NULL,
-  tipoAlerta ENUM('perigo','atenção') NOT NULL,
+  tipoAlerta ENUM('perigo', 'atencao') NOT NULL,
   dataHora DATETIME NOT NULL,
-  condicao ENUM('<','>','==', '=>', '<=')
+  condicao ENUM('<', '>', '==', '>=', '<=') NOT NULL,
   valor FLOAT NOT NULL,
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -62,9 +62,8 @@ CREATE TABLE Notificacao (
   id INT AUTO_INCREMENT PRIMARY KEY,
   alertaId INT NOT NULL,
   parametroId INT NOT NULL,
+  mensagemAlerta VARCHAR(255) NOT NULL,
   dataNotificacao DATETIME NOT NULL,
-  mensagem VARCHAR(255) NOT NULL,
-  FOREIGN KEY (mensagem) REFERENCES Alerta(mensagemAlerta),
   FOREIGN KEY (alertaId) REFERENCES Alerta(id),
   FOREIGN KEY (parametroId) REFERENCES Parametro(id)
 );
