@@ -10,7 +10,7 @@ CREATE TABLE Usuario (
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de Estações Meteorológicas
+-- Tabela das Estações Meteorológicas
 CREATE TABLE Estacao (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nome VARCHAR(100) NOT NULL,
@@ -26,10 +26,9 @@ CREATE TABLE Estacao (
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Tabela de Parâmetros
+-- Tabela dos Parâmetros
 CREATE TABLE Parametro (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  estacaoId INT,
   unidade VARCHAR(20) NOT NULL,
   fator FLOAT NOT NULL,
   offset FLOAT NOT NULL,
@@ -37,9 +36,18 @@ CREATE TABLE Parametro (
   valorMaximo FLOAT NOT NULL,
   descricao VARCHAR(255),
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (estacaoId) REFERENCES Estacao(id)
+  atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- Tabela intermediária para associação muitos-para-muitos entre Estacao e Parametro
+CREATE TABLE Estacao_Parametro (
+  estacao_id INT,
+  parametro_id INT,
+  PRIMARY KEY (estacao_id, parametro_id),
+  FOREIGN KEY (estacao_id) REFERENCES Estacao(id) ON DELETE CASCADE,
+  FOREIGN KEY (parametro_id) REFERENCES Parametro(id) ON DELETE CASCADE
+);
+
 
 -- Tabela de Alertas
 CREATE TABLE Alerta (
