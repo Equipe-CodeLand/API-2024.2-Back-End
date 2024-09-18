@@ -3,6 +3,7 @@ import { connectToDatabase } from "../config";
 interface Props {
     tabela: string;
     where?: string;
+    joins?: string;
 }
 
 export default async function selectMysql(props: Props) {
@@ -11,6 +12,11 @@ export default async function selectMysql(props: Props) {
 
         // Criação do SQL dinâmico para fazer um select
         let query = `SELECT * FROM ${props.tabela} `;
+
+        // Adiciona as joins, se fornecidas
+        if (props.joins) {
+            query += ` ${props.joins}`;
+        }
 
         // Verificação se há um WHERE
         if (props.where) { // Se houver, adicionar ao final da query
