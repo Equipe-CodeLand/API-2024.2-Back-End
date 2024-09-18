@@ -29,12 +29,13 @@ CREATE TABLE Estacao (
 -- Tabela dos Parâmetros
 CREATE TABLE Parametro (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
   unidade VARCHAR(20) NOT NULL,
   fator FLOAT NOT NULL,
   offset FLOAT NOT NULL,
-  valorMinimo FLOAT NOT NULL,
-  valorMaximo FLOAT NOT NULL,
-  descricao VARCHAR(255),
+  -- valorMinimo FLOAT NOT NULL,
+  -- valorMaximo FLOAT NOT NULL,
+  descricao VARCHAR(255) NOT NULL,
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
