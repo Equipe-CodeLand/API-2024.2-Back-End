@@ -21,10 +21,9 @@ export default class ParametroController {
     static async buscarParametrosEstacao(idEstacao: number) {
         try {
             const result = await selectMysql({
+                select: 'select p.id, p.unidade, p.fator, p.offset, p.descricao from ',
                 tabela: 'parametro p',
-                joins: `
-                    INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id
-                    INNER JOIN estacao e ON ep.estacao_id = e.id`,
+                joins: ` INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id INNER JOIN estacao e ON ep.estacao_id = e.id`,
                 where: `e.id = ${idEstacao}`
             });
             return result

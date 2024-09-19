@@ -37,4 +37,16 @@ rotas.get('/estacao', async (req, res) => {
   }
 })
 
+rotas.get('/estacao/alerta/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+
+  try {
+    const alerta = await EstacaoController.verificarAlertas(id)
+    res.status(200).json(alerta)
+  } catch (error) {
+    console.error('Erro ao buscar alertas:', error);
+    res.status(500)
+  }
+})
+
 export default rotas;
