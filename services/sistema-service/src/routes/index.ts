@@ -50,4 +50,29 @@ router.get('/parametros', async (req, res) => {
   }
 });
 
+// Rota para editar um parâmetro
+router.put('/parametro/:id', async (req, res) => {
+  const parametro = req.body;
+  const id = parseInt(req.params.id);
+  const result = await ParametroController.atualizarParametro({ ...parametro, id });
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+// Rota para deletar um parâmetro
+router.delete('/parametro/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const result = await ParametroController.deletarParametro(id);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
 export default router;
