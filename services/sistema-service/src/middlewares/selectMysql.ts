@@ -8,9 +8,9 @@ interface Props {
 export default async function selectMysql(props: Props) {
     try {
         const connection = await connectToDatabase();
-        let query = `SELECT * FROM ${props.tabela}; `;
+        let query = `SELECT * FROM ${props.tabela} `;
         if (props.where) {
-            query += ` WHERE ${props.where};`;
+            query += ` WHERE ${props.where}`;
         }
         const [result] = await connection.execute(query);
 

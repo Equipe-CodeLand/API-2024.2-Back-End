@@ -25,5 +25,29 @@ router.get('/usuarios', async (req, res) => {
   }
 });
 
+// Rota para atualizar usuário
+router.put("/usuario/atualizar", async (req, res) => {
+  const usuario = req.body;
+  const result = await UsuarioController.atualizarUsario(usuario);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+// Rota para deletar usuário
+router.delete("/usuario/deletar", async (req, res) => {
+  const { id } = req.body;
+  const result = await UsuarioController.deletarUsuario(id);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
 
 export default router;
