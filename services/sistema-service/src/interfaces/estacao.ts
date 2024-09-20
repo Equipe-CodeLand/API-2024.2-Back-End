@@ -1,3 +1,5 @@
+import { Parametro } from "./parametro"
+
 export interface Estacao{
     id: number,
     nome: string,
@@ -7,5 +9,6 @@ export interface Estacao{
     bairro: string,
     cidade: string,
     rua: string,
+    parametros: Parametro[]
     status?: boolean
 }
