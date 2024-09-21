@@ -8,19 +8,14 @@ interface Props {
 export default async function selectMysql(props: Props) {
     try {
         const connection = await connectToDatabase();
-
-        // Criação do SQL dinâmico para fazer um select
         let query = `SELECT * FROM ${props.tabela} `;
-
-        // Verificação se há um WHERE
-        if (props.where) { // Se houver, adicionar ao final da query
+        if (props.where) {
             query += ` WHERE ${props.where}`;
         }
-
-        // Execução da query com os valores
         const [result] = await connection.execute(query);
 
-        return result; // Retornar o resultado se necessário
+        // Garante que o resultado é um array
+        return Array.isArray(result) ? result : [];
     } catch (error) {
         console.error('Error inserting data:', error);
         throw error;
