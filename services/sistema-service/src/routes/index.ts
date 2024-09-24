@@ -69,6 +69,17 @@ router.post('/estacao/cadastro', async (req, res) => {
   }
 });
 
+router.put("/estacao/atualizar", async (req, res) => {
+  const estacao = req.body;
+  const result = await EstacaoController.atualizarEstacao(estacao);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
 // Rota para atualizar usuário
 router.put("/usuario/atualizar", async (req, res) => {
   const usuario = req.body;

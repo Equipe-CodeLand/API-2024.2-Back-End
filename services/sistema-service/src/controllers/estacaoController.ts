@@ -3,6 +3,7 @@ import { Estacao } from "../interfaces/estacao";
 import selectMysql from "../middlewares/selectMysql"
 import ParametroController from "./parametroController";
 import insertMysql from "../middlewares/insertMysql";
+import updateMysql from "../middlewares/updateMysql";
 
 export default class EstacaoController {
 
@@ -113,4 +114,49 @@ export default class EstacaoController {
             };
         }
     }
+
+    static async buscarEstacaoPorId(id: number){
+        const result = await selectMysql({ tabela: 'Estacao', where: `id = ${id}` });
+        return result
+      }
+
+    static async atualizarEstacao(estacao: Estacao){
+        console.log('Estacao:', estacao);
+        if (estacao.id === undefined || (await this.buscarEstacaoPorId(estacao.id)).length === 0) {
+          return {
+            success: false,
+            message: 'Estação não encontrada',
+          };
+        }
+        const tabela = 'Estacao'; // Nome da tabela no banco de dados
+        const colunas = ['nome', 'uid', 'cep', 'numero', 'bairro', 'cidade', 'rua']; // Colunas que vão ser atualizadas
+        const valores = [
+          estacao.nome,
+          estacao.uid,
+          estacao.cep,
+          estacao.numero,
+          estacao.bairro,
+          estacao.cidade,
+          estacao.rua
+        ];
+    
+        try {
+          // ATUALIZAÇÃO de uma estacao no banco de dados
+          const result = await updateMysql({ tabela, colunas, valores, where: `id = ${estacao.id}` });
+          console.log('Estação atualizada com sucesso');
+          
+          return {
+            success: true,
+            message: 'Estação atualizada com sucesso',
+            insertId: result
+          };
+        } catch (error) {
+          console.error('Erro ao atualizar estação:', error);
+          return {
+            success: false,
+            message: 'Erro ao atualizar estação',
+            error
+          };
+        }
+      }
 }
