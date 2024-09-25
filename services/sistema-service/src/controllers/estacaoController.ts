@@ -4,6 +4,7 @@ import selectMysql from "../middlewares/selectMysql"
 import ParametroController from "./parametroController";
 import insertMysql from "../middlewares/insertMysql";
 import updateMysql from "../middlewares/updateMysql";
+import deleteMysql from "../middlewares/deleteMysql";
 
 export default class EstacaoController {
 
@@ -120,14 +121,17 @@ export default class EstacaoController {
         return result
       }
 
-    static async atualizarEstacao(estacao: Estacao){
+      static async atualizarEstacao(estacao: Estacao, parametros: number[]) {
         console.log('Estacao:', estacao);
+        
+        // Verifica se a estação existe
         if (estacao.id === undefined || (await this.buscarEstacaoPorId(estacao.id)).length === 0) {
           return {
             success: false,
             message: 'Estação não encontrada',
           };
         }
+      
         const tabela = 'Estacao'; // Nome da tabela no banco de dados
         const colunas = ['nome', 'uid', 'cep', 'numero', 'bairro', 'cidade', 'rua']; // Colunas que vão ser atualizadas
         const valores = [
@@ -139,24 +143,40 @@ export default class EstacaoController {
           estacao.cidade,
           estacao.rua
         ];
-    
+      
         try {
-          // ATUALIZAÇÃO de uma estacao no banco de dados
+          // Atualiza os dados da estação
           const result = await updateMysql({ tabela, colunas, valores, where: `id = ${estacao.id}` });
           console.log('Estação atualizada com sucesso');
-          
+      
+          // Atualiza os parâmetros associados à estação na tabela de junção estacao_parametro
+          // Primeiro, remove todos os parâmetros antigos relacionados à estação
+          await deleteMysql({
+            tabela: 'estacao_parametro',
+            where: `estacao_id = ${estacao.id}`
+          });
+      
+          // Em seguida, insere os novos parâmetros
+          for (const parametroId of parametros) {
+            await insertMysql({
+              tabela: 'estacao_parametro',
+              colunas: ['estacao_id', 'parametro_id'],
+              valores: [estacao.id, parametroId]
+            });
+          }
+      
           return {
             success: true,
-            message: 'Estação atualizada com sucesso',
+            message: 'Estação e parâmetros atualizados com sucesso',
             insertId: result
           };
         } catch (error) {
-          console.error('Erro ao atualizar estação:', error);
+          console.error('Erro ao atualizar estação e parâmetros:', error);
           return {
             success: false,
-            message: 'Erro ao atualizar estação',
+            message: 'Erro ao atualizar estação e parâmetros',
             error
-          };
-        }
+          };
+        }
       }
 }

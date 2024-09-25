@@ -71,7 +71,8 @@ router.post('/estacao/cadastro', async (req, res) => {
 
 router.put("/estacao/atualizar", async (req, res) => {
   const estacao = req.body;
-  const result = await EstacaoController.atualizarEstacao(estacao);
+  const parametro = req.body;
+  const result = await EstacaoController.atualizarEstacao(estacao, parametro);
 
   if (result.success) {
     res.status(200).json(result);
