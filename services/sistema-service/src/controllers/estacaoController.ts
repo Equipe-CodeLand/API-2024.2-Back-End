@@ -176,7 +176,28 @@ export default class EstacaoController {
             success: false,
             message: 'Erro ao atualizar estação e parâmetros',
             error
-          };
-        }
+            };
+        }
+      }
+
+      static async deletarEstacao(id: number){
+        try {
+          // DELEÇÃO de uma estação no banco de dados
+          const result = await deleteMysql({ tabela: 'Estacao', where: `id = ${id}` });
+          console.log('Estacao deletada com sucesso');
+          
+          return {
+            success: true,
+            message: 'Estação deletada com sucesso',
+            insertId: result
+          };
+        } catch (error) {
+          console.error('Erro ao deletar estação:', error);
+          return {
+            success: false,
+            message: 'Erro ao deletar estação',
+            error
+          };
+        }
       }
 }

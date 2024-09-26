@@ -69,10 +69,24 @@ router.post('/estacao/cadastro', async (req, res) => {
   }
 });
 
-router.put("/estacao/atualizar", async (req, res) => {
-  const estacao = req.body;
-  const parametro = req.body;
-  const result = await EstacaoController.atualizarEstacao(estacao, parametro);
+router.put("/estacao/atualizar/:id", async (req, res) => {
+  const estacaoId = req.params.id; // Captura o ID da estação da URL
+  const estacao = req.body; // Captura o corpo da requisição
+  const parametros = estacao.parametros; // Extraí os parâmetros do corpo da requisição
+
+  const result = await EstacaoController.atualizarEstacao({ ...estacao, id: estacaoId }, parametros); // Chama o controlador
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+// Rota para deletar estação
+router.delete("/estacao/deletar/", async (req, res) => {
+  const { id } = req.body;
+  const result = await EstacaoController.deletarEstacao(id);
 
   if (result.success) {
     res.status(200).json(result);
