@@ -81,20 +81,6 @@ router.post('/estacao/cadastro', async (req, res) => {
   }
 });
 
-// Rota para editar um parâmetro
-router.put('/parametro/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const parametro = req.body;
-  const result = await ParametroController.atualizarParametro(id, parametro);
-
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
-
-// Rota para atualizar estacão
 router.put("/estacao/atualizar/:id", async (req, res) => {
   const estacaoId = req.params.id; // Captura o ID da estação da URL
   const estacao = req.body; // Captura o corpo da requisição
@@ -108,6 +94,7 @@ router.put("/estacao/atualizar/:id", async (req, res) => {
     res.status(500).json(result);
   }
 });
+
 
 // Rota para deletar um parâmetro
 router.delete('/parametro/:id', async (req, res) => {
