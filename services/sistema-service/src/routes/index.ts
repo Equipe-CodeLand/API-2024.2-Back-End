@@ -2,6 +2,7 @@ import { Router } from "express";
 import UsuarioController from "../controllers/usuarioController";
 import EstacaoController from "../controllers/estacaoController";
 import ParametroController from "../controllers/parametroController";
+import AlertaController from "../controllers/alertaController";
 
 const router = Router();
 
@@ -119,5 +120,48 @@ router.get('/estacao/alerta/:id', async (req, res) => {
     res.status(500)
   }
 })
+
+router.post('/alerta/cadastro', async (req, res) => {
+  const alerta = req.body;
+
+  try {
+      const result = await AlertaController.cadastrarAlerta(alerta); 
+
+      if (result.success) {
+          res.status(201).json(result);
+      } else {
+          res.status(500).json(result);
+      }
+  } catch (error) {
+      console.error('Erro ao cadastrar alerta:', error);
+      res.status(500).json({ error: 'Erro ao cadastrar alerta' });
+  }
+});
+
+// Rota para deletar uma estação
+router.delete('/estacao/deletar/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const result = await EstacaoController.deletarEstacao(id);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+// Rota para deletar um alerta
+router.delete('/alerta/deletar/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const result = await AlertaController.deletarAlerta(id);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+
 
 export default router;

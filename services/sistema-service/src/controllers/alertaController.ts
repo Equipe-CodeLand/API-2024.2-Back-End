@@ -1,11 +1,12 @@
 import { Alerta } from "../interfaces/alerta";
 import insertMysql from "../middlewares/insertMysql";
-import { TipoAlerta, Condicao } from "../enums/alertaEnum"; // Importar os enums
+import { TipoAlerta, Condicao } from "../enums/alertaEnum";
+import deleteMysql from "../middlewares/deleteMysql";
 
 export default class AlertaController {
-    // Função para cadastrar um novo alerta
+
     static async cadastrarAlerta(alerta: Alerta) {
-        const tabela = 'Alerta'; // Nome da tabela no banco de dados (com 'A' maiúsculo conforme a definição da tabela)
+        const tabela = 'Alerta'; 
         const colunas = [
             'estacaoId', 
             'parametroId', 
@@ -13,9 +14,8 @@ export default class AlertaController {
             'tipoAlerta', 
             'condicao', 
             'valor'
-        ]; // Colunas que vão ser inseridas na tabela Alerta
-
-        // Verifica se os campos obrigatórios estão presentes e usa os enums
+        ]; 
+        
         const valores = [
             alerta.estacaoId,
             alerta.parametroId,
@@ -25,14 +25,12 @@ export default class AlertaController {
             alerta.valor
         ];
         
-        // Verifica se algum valor é undefined
         if (valores.some(val => val === undefined)) {
             throw new Error('Todos os campos obrigatórios devem estar preenchidos.');
         }        
              
-
         try {
-            // Inserir o alerta na tabela 'Alerta'
+        
             const result: any = await insertMysql({ tabela, colunas, valores });
             console.log('Alerta inserido com sucesso');
 
@@ -50,4 +48,27 @@ export default class AlertaController {
             };
         }
     }
+
+    
+    static async deletarAlerta(id: number) {
+        try {
+          // Deletar o alerta com o id fornecido
+          const result = await deleteMysql({ tabela: 'Alerta', where: `id = ${id}` });
+          console.log('Alerta deletado com sucesso');
+          
+          return {
+            success: true,
+            message: 'Alerta deletado com sucesso',
+            insertId: result
+          };
+        } catch (error) {
+          console.error('Erro ao deletar Alerta:', error);
+          return {
+            success: false,
+            message: 'Erro ao deletar Alerta',
+            error
+          };
+        }
+      }
+      
 }
