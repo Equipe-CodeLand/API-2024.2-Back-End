@@ -30,12 +30,11 @@ export default async function selectMysql(props: Props) {
         if (props.where) { // Se houver, adicionar ao final da query
             query += ` WHERE ${props.where}`;
         }
-
-        // Execução da query com os valores
         const [result] = await connection.execute(query);
 
+        // Garante que o resultado é um array
         connection.end()
-        return result; // Retornar o resultado se necessário
+        return Array.isArray(result) ? result : [];
     } catch (error) {
         console.error('Error inserting data:', error);
         throw error;
