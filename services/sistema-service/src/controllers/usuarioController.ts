@@ -71,7 +71,7 @@ export default class UsuarioController {
     return result
   }
 
-  static async atualizarUsario(usuario: Usuario){
+  static async atualizarUsuario(usuario: Usuario){
     console.log('Usuario:', usuario);
     if (usuario.id === undefined || (await this.buscarUsuarioPorId(usuario.id)).length === 0) {
       return {
