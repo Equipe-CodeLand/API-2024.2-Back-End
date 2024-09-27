@@ -9,3 +9,10 @@ export interface Parametro {
     atualizadoEm?: string;
   }
   
+// export interface Parametro{
+//     id: number,
+//     nome: string,
+//     fator: number,
+//     offset: number,
+//     descricao: string
+// }

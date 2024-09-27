@@ -1,5 +1,6 @@
 import { Router } from "express";
 import UsuarioController from "../controllers/usuarioController";
+import EstacaoController from "../controllers/estacaoController";
 import ParametroController from "../controllers/parametroController";
 
 const router = Router();
@@ -39,6 +40,48 @@ router.post('/parametro/cadastro', async (req, res) => {
   }
 });
 
+// router.get('/parametro', async (req, res) => {
+//   const parametros = await ParametroController.buscarParametros()
+
+//   if(parametros){
+//     res.status(200).json(parametros)
+//   } else {
+//     res.status(500)
+//   }
+// })
+
+router.get('/parametro/estacao/:id', async (req,res) => {
+  const idEstacao = parseInt(req.params.id)
+  const parametros = await ParametroController.buscarParametrosEstacao(idEstacao)
+
+  if (parametros) {
+    res.status(200).json(parametros)
+  } else {
+    res.status(500)
+  }
+})
+
+router.get('/estacao', async (req, res) => {
+  const estacoes = await EstacaoController.buscarEstacoes()
+
+  if (estacoes) {
+    res.status(200).json(estacoes)
+  } else {
+    res.status(500)
+  }
+})
+
+router.post('/estacao/cadastro', async (req, res) => {
+  const estacao = req.body;
+  const result = await EstacaoController.cadastrarEstacao(estacao);
+
+  if (result.success) {
+    res.status(201).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
 // Rota para listar os parâmetros
 router.get('/parametros', async (req, res) => {
   const result = await ParametroController.buscarParametros();
@@ -52,9 +95,24 @@ router.get('/parametros', async (req, res) => {
 
 // Rota para editar um parâmetro
 router.put('/parametro/:id', async (req, res) => {
-  const parametro = req.body;
   const id = parseInt(req.params.id);
-  const result = await ParametroController.atualizarParametro({ ...parametro, id });
+  const parametro = req.body;
+  const result = await ParametroController.atualizarParametro(id, parametro);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+// Rota para atualizar estacão
+router.put("/estacao/atualizar/:id", async (req, res) => {
+  const estacaoId = req.params.id; // Captura o ID da estação da URL
+  const estacao = req.body; // Captura o corpo da requisição
+  const parametros = estacao.parametros; // Extraí os parâmetros do corpo da requisição
+
+  const result = await EstacaoController.atualizarEstacao({ ...estacao, id: estacaoId }, parametros); // Chama o controlador
 
   if (result.success) {
     res.status(200).json(result);
@@ -74,5 +132,41 @@ router.delete('/parametro/:id', async (req, res) => {
     res.status(500).json(result);
   }
 });
+
+// Rota para atualizar usuário
+router.put("/usuario/atualizar", async (req, res) => {
+  const usuario = req.body;
+  const result = await UsuarioController.atualizarUsuario(usuario);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+// Rota para deletar usuário
+router.delete("/usuario/deletar", async (req, res) => {
+  const { id } = req.body;
+  const result = await UsuarioController.deletarUsuario(id);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
+
+router.get('/estacao/alerta/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+
+  try {
+    const alerta = await EstacaoController.verificarAlertas(id)
+    res.status(200).json(alerta)
+  } catch (error) {
+    console.error('Erro ao buscar alertas:', error);
+    res.status(500)
+  }
+})
 
 export default router;

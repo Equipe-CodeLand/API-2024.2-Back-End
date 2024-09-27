@@ -9,7 +9,7 @@ export default class ParametroController {
 
   // Função para cadastrar um novo parâmetro
   static async cadastrarParametro(parametro: Parametro) {
-    const tabela = 'Parametro';// Nome da tabela no banco de dados
+    const tabela = 'Parametro'; // Nome da tabela no banco de dados
     const colunas = ['nome', 'unidade', 'fator', 'offset', 'descricao']; // Colunas que vão ser inseridas
     const valores = [
       parametro.nome,
@@ -20,7 +20,7 @@ export default class ParametroController {
     ];
 
     try {
-        // INSERÇÃO de um novo parâmetro no banco de dados
+      // INSERÇÃO de um novo parâmetro no banco de dados
       const result = await insertMysql({ tabela, colunas, valores });
       console.log('Parâmetro inserido com sucesso');
       
@@ -92,7 +92,7 @@ export default class ParametroController {
   }
 
   // Função para atualizar um parâmetro
-  static async atualizarParametro(parametro: Parametro) {
+  static async atualizarParametro(id: number, parametro: Parametro) {
     const tabela = 'Parametro';
     const colunas = ['nome', 'unidade', 'fator', 'offset', 'descricao'];
     const valores = [
@@ -105,7 +105,7 @@ export default class ParametroController {
 
     try {
       // ATUALIZAÇÃO de um parâmetro no banco de dados
-      const result = await updateMysql({ tabela, colunas, valores, where: `id = ${parametro.id}` });
+      const result = await updateMysql({ tabela, colunas, valores, where: `id = ${id}` });
       console.log('Parâmetro atualizado com sucesso');
       
       return {
@@ -143,4 +143,39 @@ export default class ParametroController {
       };
     }
   }
+
+  static async buscarParametrosEstacao(idEstacao: number) {
+    try {
+      const result = await selectMysql({
+        select: 'select p.id, p.unidade, p.fator, p.offset, p.descricao from ',
+        tabela: 'parametro p',
+        joins: ` INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id INNER JOIN estacao e ON ep.estacao_id = e.id`,
+        where: `e.id = ${idEstacao}`
+      });
+      return result;
+    } catch (error) {
+      console.error('Erro ao buscar parâmetro:', error);
+      return {
+        success: false,
+        message: 'Erro ao buscar parâmetro',
+        error
+      };
+    }
+  }
 }
+
+    // static async buscarParametros() {
+    //     const tabela = "parametro"
+
+    //     try {
+    //         const result = selectMysql({ tabela })
+    //         return result
+    //     } catch (error) {
+    //         console.error('Erro ao buscar parâmetro:', error);
+    //         return {
+    //             success: false,
+    //             message: 'Erro ao buscar parâmetro',
+    //             error
+    //         };
+    //     }
+    // }

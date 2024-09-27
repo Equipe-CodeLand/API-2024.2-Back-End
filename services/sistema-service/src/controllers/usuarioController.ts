@@ -72,6 +72,13 @@ export default class UsuarioController {
   }
 
   static async atualizarUsario(usuario: Usuario){
+    console.log('Usuario:', usuario);
+    if (usuario.id === undefined || (await this.buscarUsuarioPorId(usuario.id)).length === 0) {
+      return {
+        success: false,
+        message: 'Usuário não encontrado',
+      };
+    }
     const tabela = 'Usuario'; // Nome da tabela no banco de dados
     const colunas = ['nome', 'email', 'senha', 'cpf', 'perfil']; // Colunas que vão ser atualizadas
     const valores = [
