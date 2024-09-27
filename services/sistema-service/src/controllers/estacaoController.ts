@@ -176,7 +176,7 @@ export default class EstacaoController {
             success: false,
             message: 'Erro ao atualizar estação e parâmetros',
             error
-          };
-        }
+            };
+        }
       }
 }
