@@ -26,7 +26,6 @@ router.get('/usuarios', async (req, res) => {
     res.status(500).json(result);
   }
 });
-;
 
 // Rota para cadastrar um parâmetro
 router.post('/parametro/cadastro', async (req, res) => {
@@ -40,15 +39,15 @@ router.post('/parametro/cadastro', async (req, res) => {
   }
 });
 
-// router.get('/parametro', async (req, res) => {
-//   const parametros = await ParametroController.buscarParametros()
+router.get('/parametros', async (req, res) => {
+  const parametros = await ParametroController.buscarParametros()
 
-//   if(parametros){
-//     res.status(200).json(parametros)
-//   } else {
-//     res.status(500)
-//   }
-// })
+  if(parametros){
+    res.status(200).json(parametros)
+  } else {
+    res.status(500)
+  }
+})
 
 router.get('/parametro/estacao/:id', async (req,res) => {
   const idEstacao = parseInt(req.params.id)
@@ -77,17 +76,6 @@ router.post('/estacao/cadastro', async (req, res) => {
 
   if (result.success) {
     res.status(201).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
-
-// Rota para listar os parâmetros
-router.get('/parametros', async (req, res) => {
-  const result = await ParametroController.buscarParametros();
-
-  if (result.success) {
-    res.status(200).json(result.parametros);
   } else {
     res.status(500).json(result);
   }
@@ -168,5 +156,18 @@ router.get('/estacao/alerta/:id', async (req, res) => {
     res.status(500)
   }
 })
+
+// Rota para atualizar um parâmetro
+router.put('/parametro/atualizar/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const parametro = req.body;
+  const result = await ParametroController.atualizarParametro(id, parametro);
+
+  if (result.success) {
+    res.status(200).json(result);
+  } else {
+    res.status(500).json(result);
+  }
+});
 
 export default router;
