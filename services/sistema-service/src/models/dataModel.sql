@@ -64,6 +64,9 @@ CREATE TABLE Alerta (
   FOREIGN KEY (parametroId) REFERENCES Parametro(id)
 );
 
+ALTER TABLE Alerta
+MODIFY COLUMN dataHora DATETIME DEFAULT CURRENT_TIMESTAMP;
+
 -- Tabela de Notificações
 CREATE TABLE Notificacao (
   id INT AUTO_INCREMENT PRIMARY KEY,

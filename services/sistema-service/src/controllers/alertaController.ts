@@ -88,4 +88,34 @@ export default class AlertaController {
         }
     }
 
+    static async deletarAlerta(alertaId: number) {
+        const tabela = 'Alerta';
+        const where = `id = ${alertaId}`; // Adicionando a condição no formato esperado
+    
+        try {
+            const result: any = await deleteMysql({ tabela, where });
+            if (result.affectedRows > 0) {
+                console.log('Alerta deletado com sucesso');
+                return {
+                    success: true,
+                    message: 'Alerta deletado com sucesso',
+                    result: result
+                };
+            } else {
+                return {
+                    success: false,
+                    message: 'Nenhum alerta encontrado com o ID fornecido',
+                };
+            }
+        } catch (error) {
+            console.error('Erro ao deletar alerta:', error);
+            return {
+                success: false,
+                message: 'Erro ao deletar alerta',
+                error
+            };
+        }
+    }
+    
+
 }

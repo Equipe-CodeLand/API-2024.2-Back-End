@@ -150,4 +150,21 @@ router.get('/alertas', async (req, res) => {
   }
 });
 
+router.delete('/alerta/deletar/:id', async (req, res) => {
+  const alertaId = parseInt(req.params.id); // Captura o ID do alerta da URL
+
+  try {
+    const result = await AlertaController.deletarAlerta(alertaId); // Chama a função de deletar alerta
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: 'Alerta não encontrado' });
+    }
+  } catch (error) {
+    console.error('Erro ao deletar alerta:', error);
+    res.status(500).json({ error: 'Erro ao deletar alerta' });
+  }
+});
+
 export default router;
