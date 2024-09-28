@@ -3,6 +3,8 @@ import UsuarioController from "../controllers/usuarioController";
 import EstacaoController from "../controllers/estacaoController";
 import ParametroController from "../controllers/parametroController";
 import AlertaController from "../controllers/alertaController";
+import obterAlertas from "../controllers/alertaController";
+import deletarAlerta from "../controllers/alertaController"
 
 const router = Router();
 
@@ -121,6 +123,7 @@ router.get('/estacao/alerta/:id', async (req, res) => {
   }
 })
 
+// Cadastro de alerta
 router.post('/alerta/cadastro', async (req, res) => {
   const alerta = req.body;
 
@@ -150,18 +153,32 @@ router.delete('/estacao/deletar/:id', async (req, res) => {
   }
 });
 
-// Rota para deletar um alerta
-router.delete('/alerta/deletar/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const result = await AlertaController.deletarAlerta(id);
 
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
+router.get('/alertas', async (req, res) => {
+  try {
+    const alertas = await AlertaController.obterAlertas();
+    res.status(200).json(alertas);
+  } catch (error) {
+    console.error('Erro ao buscar alertas:', error);
+    res.status(500).json({ error: 'Erro ao buscar alertas' });
   }
 });
 
+router.delete('/alerta/deletar/:id', async (req, res) => {
+  const alertaId = parseInt(req.params.id); // Captura o ID do alerta da URL
 
+  try {
+    const result = await AlertaController.deletarAlerta(alertaId); // Chama a função de deletar alerta
+
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(404).json({ message: 'Alerta não encontrado' });
+    }
+  } catch (error) {
+    console.error('Erro ao deletar alerta:', error);
+    res.status(500).json({ error: 'Erro ao deletar alerta' });
+  }
+});
 
 export default router;
