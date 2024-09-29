@@ -181,4 +181,23 @@ router.delete('/alerta/deletar/:id', async (req, res) => {
   }
 });
 
+// Rota para atualizar um alerta
+router.put("/alerta/atualizar/:id", async (req, res) => {
+  const alertaId = req.params.id; 
+  const alerta = req.body; 
+
+  try {
+    const result = await AlertaController.atualizarAlerta({ ...alerta, id: alertaId }); 
+    if (result.success) {
+      res.status(200).json(result);
+    } else {
+      res.status(400).json(result); 
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar alerta:", error);
+    res.status(500).json({ success: false, message: 'Erro interno do servidor' });
+  }
+});
+
+
 export default router;
