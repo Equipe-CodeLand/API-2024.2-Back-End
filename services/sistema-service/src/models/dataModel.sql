@@ -33,8 +33,6 @@ CREATE TABLE Parametro (
   unidade VARCHAR(20) NOT NULL,
   fator FLOAT NOT NULL,
   offset FLOAT NOT NULL,
-  -- valorMinimo FLOAT NOT NULL,
-  -- valorMaximo FLOAT NOT NULL,
   descricao VARCHAR(255) NOT NULL,
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -49,7 +47,6 @@ CREATE TABLE Estacao_Parametro (
   FOREIGN KEY (parametro_id) REFERENCES Parametro(id) ON DELETE CASCADE
 );
 
-
 -- Tabela de Alertas
 CREATE TABLE Alerta (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,17 +54,14 @@ CREATE TABLE Alerta (
   parametroId INT,
   mensagemAlerta VARCHAR(255) NOT NULL,
   tipoAlerta ENUM('perigo', 'atencao') NOT NULL,
-  dataHora DATETIME DEFAULT CURRENT_TIMESTAMP;
+  dataHora DATETIME DEFAULT CURRENT_TIMESTAMP,
   condicao ENUM('<', '>', '==', '>=', '<=') NOT NULL,
   valor FLOAT NOT NULL,
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (estacaoId) REFERENCES Estacao(id) ON DELETE CASCADE,
-  FOREIGN KEY (parametroId) REFERENCES Parametro(id)
+  FOREIGN KEY (parametroId) REFERENCES Parametro(id) ON DELETE CASCADE
 );
-
-ALTER TABLE Alerta
-MODIFY COLUMN dataHora DATETIME DEFAULT CURRENT_TIMESTAMP;
 
 -- Tabela de Notificações
 CREATE TABLE Notificacao (
