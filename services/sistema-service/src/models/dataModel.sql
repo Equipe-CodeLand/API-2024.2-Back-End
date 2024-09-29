@@ -57,14 +57,16 @@ CREATE TABLE Alerta (
   parametroId INT,
   mensagemAlerta VARCHAR(255) NOT NULL,
   tipoAlerta ENUM('perigo', 'atencao') NOT NULL,
-  dataHora DATETIME NOT NULL,
   condicao ENUM('<', '>', '==', '>=', '<=') NOT NULL,
   valor FLOAT NOT NULL,
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   atualizadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (estacaoId) REFERENCES Estacao(id),
+  FOREIGN KEY (estacaoId) REFERENCES Estacao(id) ON DELETE CASCADE,
   FOREIGN KEY (parametroId) REFERENCES Parametro(id)
 );
+
+ALTER TABLE Alerta
+MODIFY COLUMN dataHora DATETIME DEFAULT CURRENT_TIMESTAMP;
 
 -- Tabela de Notificações
 CREATE TABLE Notificacao (

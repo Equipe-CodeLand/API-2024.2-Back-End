@@ -23,7 +23,7 @@ export default class ParametroController {
       // INSERÇÃO de um novo parâmetro no banco de dados
       const result = await insertMysql({ tabela, colunas, valores });
       console.log('Parâmetro inserido com sucesso');
-      
+
       return {
         success: true,
         message: 'Parâmetro cadastrado com sucesso',
@@ -62,6 +62,24 @@ export default class ParametroController {
         success: false,
         message: 'Erro ao buscar parâmetros',
         error,
+      };
+    }
+  }
+  static async buscarParametrosEstacao(idEstacao: number) {
+    try {
+      const result = await selectMysql({
+        select: 'select p.id, p.nome, p.unidade, p.fator, p.offset, p.descricao from ',
+        tabela: 'parametro p',
+        joins: ` INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id INNER JOIN estacao e ON ep.estacao_id = e.id`,
+        where: `e.id = ${idEstacao}`
+      });
+      return result
+    } catch (error) {
+      console.error('Erro ao buscar parâmetro:', error);
+      return {
+        success: false,
+        message: 'Erro ao buscar parâmetro',
+        error
       };
     }
   }
@@ -110,7 +128,7 @@ export default class ParametroController {
       // ATUALIZAÇÃO de um parâmetro no banco de dados
       const result = await updateMysql({ tabela, colunas, valores, where: `id = ${id}` });
       console.log('Parâmetro atualizado com sucesso');
-      
+
       return {
         success: true,
         message: 'Parâmetro atualizado com sucesso',
@@ -131,7 +149,7 @@ export default class ParametroController {
     try {
       const result = await deleteMysql({ tabela: 'Parametro', where: `id = ${id}` });
       console.log('Parâmetro deletado com sucesso');
-      
+
       return {
         success: true,
         message: 'Parâmetro deletado com sucesso',
@@ -142,25 +160,6 @@ export default class ParametroController {
       return {
         success: false,
         message: 'Erro ao deletar parâmetro',
-        error
-      };
-    }
-  }
-
-  static async buscarParametrosEstacao(idEstacao: number) {
-    try {
-      const result = await selectMysql({
-        select: 'select p.id, p.unidade, p.fator, p.offset, p.descricao from ',
-        tabela: 'parametro p',
-        joins: ` INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id INNER JOIN estacao e ON ep.estacao_id = e.id`,
-        where: `e.id = ${idEstacao}`
-      });
-      return result;
-    } catch (error) {
-      console.error('Erro ao buscar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetro',
         error
       };
     }
