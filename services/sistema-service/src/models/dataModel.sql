@@ -57,6 +57,7 @@ CREATE TABLE Alerta (
   parametroId INT,
   mensagemAlerta VARCHAR(255) NOT NULL,
   tipoAlerta ENUM('perigo', 'atencao') NOT NULL,
+  dataHora DATETIME DEFAULT CURRENT_TIMESTAMP;
   condicao ENUM('<', '>', '==', '>=', '<=') NOT NULL,
   valor FLOAT NOT NULL,
   criadoEm TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
