@@ -52,7 +52,6 @@ export default class EstacaoController {
         // Formatar a data de 'ontem' no formato SQL (YYYY-MM-DD HH:MM:SS)
         const ontemISO = ontem.toISOString().slice(0, 19).replace('T', ' ');
 
-        console.log(ontemISO);
         const where = `a.estacaoId = ${estacaoId} AND n.dataNotificacao > '${ontemISO}'`;
 
         try {

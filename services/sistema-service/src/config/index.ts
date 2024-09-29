@@ -9,7 +9,6 @@ export async function connectToDatabase() {
       database: 'api',
     });
 
-    console.log('Conectado ao banco de dados MySQL');
     return connection;
   } catch (error) {
     console.error('Erro ao conectar ao banco de dados MySQL:', error);

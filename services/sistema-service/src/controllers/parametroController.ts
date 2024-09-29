@@ -122,8 +122,6 @@ export default class ParametroController {
     ];
 
     try {
-      console.log('Atualizando parâmetro com ID:', id);
-      console.log('Valores:', valores);
 
       // ATUALIZAÇÃO de um parâmetro no banco de dados
       const result = await updateMysql({ tabela, colunas, valores, where: `id = ${id}` });
