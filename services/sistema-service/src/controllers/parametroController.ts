@@ -50,84 +50,58 @@ export default class ParametroController {
         error
       };
     }
-  }
+  }*/
 
   // Função para buscar um parâmetro por ID
-  static async buscarParametroPorId(id: number) {
+  static async buscarParametroPorId(req: Request, res: Response): Promise<void> {
     try {
-      const result = await selectMysql({ tabela: 'Parametro', where: `id = ${id}` });
-      if (result.length > 0) {
-        return {
-          success: true,
-          parametro: result[0],
-        };
-      } else {
-        return {
-          success: false,
-          message: 'Parâmetro não encontrado',
-        };
-      }
+      const parametroId = req.body;
+      const parametroRef = colecaoParametros.doc(parametroId.id);
+      const parametroEncontrado = await parametroRef.get();
+
+      res.status(200).json(parametroEncontrado);
     } catch (error) {
-      console.error('Erro ao buscar parâmetro por ID:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetro por ID',
-        error,
-      };
+      res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }
 
   // Função para atualizar um parâmetro
-  static async atualizarParametro(id: number, parametro: Parametro) {
-    const tabela = 'Parametro';
-    const colunas = ['nome', 'unidade', 'fator', 'offset', 'descricao'];
-    const valores = [
-      parametro.nome,
-      parametro.unidade,
-      parametro.fator,
-      parametro.offset,
-      parametro.descricao
-    ];
-
+  static async atualizarParametro(req: Request, res: Response) {
     try {
-
-      // ATUALIZAÇÃO de um parâmetro no banco de dados
-      const result = await updateMysql({ tabela, colunas, valores, where: `id = ${id}` });
-      console.log('Parâmetro atualizado com sucesso');
-
-      return {
-        success: true,
-        message: 'Parâmetro atualizado com sucesso',
-        updatedId: result
-      };
+      const dadosAtualizados = req.body;
+      console.log("Dados recebidos para atualização:", dadosAtualizados);
+  
+      if (!dadosAtualizados.id) {
+        res.status(400).json({ erro: "ID do parâmetro é obrigatório" });
+        return;
+      }
+  
+      const parametroRef = colecaoParametros.doc(dadosAtualizados.id);
+      const parametroAtualizado = await parametroRef.get();
+  
+      if (!parametroAtualizado.exists) {
+        res.status(404).json({ erro: "Parâmetro não encontrado" });
+        return;
+      }
+  
+      await parametroRef.update(dadosAtualizados);
+      res.status(200).json({ id: dadosAtualizados.id, ...dadosAtualizados });
     } catch (error) {
-      console.error('Erro ao atualizar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao atualizar parâmetro',
-        error
-      };
+      console.error("Erro ao atualizar parâmetro:", error);
+      res.status(500).json({ erro: "Falha ao editar parâmetro" });
     }
   }
 
   // Função para deletar um parâmetro
-  static async deletarParametro(id: number) {
+  static async deletarParametro(req: Request, res: Response) {
     try {
-      const result = await deleteMysql({ tabela: 'Parametro', where: `id = ${id}` });
-      console.log('Parâmetro deletado com sucesso');
+      const parametroId = req.body;
+      await colecaoParametros.doc(parametroId.id).delete();
 
-      return {
-        success: true,
-        message: 'Parâmetro deletado com sucesso',
-        deletedId: result
-      };
+      res.status(200).json({ success: true, message: 'Parâmetro deletado com sucesso' });
     } catch (error) {
       console.error('Erro ao deletar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao deletar parâmetro',
-        error
-      };
+      res.status(500).json({ erro: 'Falha ao deletar parâmetro' });
     }
-  }*/
+  }
 } 

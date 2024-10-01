@@ -7,16 +7,21 @@ const router = Router();
 // Rotas do CRUD do usuário
 router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario); 
 
-router.get('/usuarios', UsuarioController.buscarUsuarioPorId);
+router.get('/usuarios', UsuarioController.buscarUsuarios);
 
 router.put("/usuario/atualizar", UsuarioController.atualizarUsuario);
 
 router.delete("/usuario/deletar", UsuarioController.deletarUsuario);
 
+
 // Rotas do CRUD de parâmetros
 router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
 router.get('/parametros', ParametroController.buscarParametros)
+
+router.put('/parametro/atualizar', ParametroController.atualizarParametro);
+
+router.delete('/parametro/:id', ParametroController.deletarParametro);
 
 /* router.get('/parametro/estacao/:id', async (req,res) => {
   const idEstacao = parseInt(req.params.id)
@@ -66,16 +71,7 @@ router.put("/estacao/atualizar/:id", async (req, res) => {
 
 
 // Rota para deletar um parâmetro
-router.delete('/parametro/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const result = await ParametroController.deletarParametro(id);
 
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
 
 router.get('/estacao/alerta/:id', async (req, res) => {
   const id = parseInt(req.params.id)
@@ -90,17 +86,7 @@ router.get('/estacao/alerta/:id', async (req, res) => {
 })
 
 // Rota para atualizar um parâmetro
-router.put('/parametro/atualizar/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const parametro = req.body;
-  const result = await ParametroController.atualizarParametro(id, parametro);
 
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
 
 // Cadastro de alerta
 router.post('/alerta/cadastro', async (req, res) => {
