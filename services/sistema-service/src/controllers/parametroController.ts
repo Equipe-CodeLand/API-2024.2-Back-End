@@ -15,7 +15,7 @@ export default class ParametroController {
       const { id, ...dadosSemId } = dados;
       res.status(201).json({ id: novoUsuario.id, ...dadosSemId });
     } catch (erro) {
-        res.status(500).json({ erro: "Falha ao cadastrar categoria" });
+        res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
     }
   }
 

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import UsuarioController from "../controllers/usuarioController";
 import ParametroController from "../controllers/parametroController";
+import EstacaoController from "../controllers/estacaoController";
 
 const router = Router();
 
@@ -25,6 +26,16 @@ router.put('/parametro/atualizar/:id', ParametroController.atualizarParametro);
 
 router.delete('/parametro/:id', ParametroController.deletarParametro);
 
+
+// Rotas do CRUD de estação
+router.post('/estacao/cadastro', EstacaoController.cadastrarEstacao);
+
+router.get('/estacoes', EstacaoController.buscarEstacoes);
+
+router.put("/estacao/atualizar", EstacaoController.atualizarEstacao);
+
+router.delete('/estacao/deletar', EstacaoController.deletarEstacao);
+
 /* router.get('/parametro/estacao/:id', async (req,res) => {
   const idEstacao = parseInt(req.params.id)
   const parametros = await ParametroController.buscarParametrosEstacao(idEstacao)
@@ -35,41 +46,6 @@ router.delete('/parametro/:id', ParametroController.deletarParametro);
     res.status(500)
   }
 })
-
-router.get('/estacao', async (req, res) => {
-  const estacoes = await EstacaoController.buscarEstacoes()
-
-  if (estacoes) {
-    res.status(200).json(estacoes)
-  } else {
-    res.status(500)
-  }
-})
-
-router.post('/estacao/cadastro', async (req, res) => {
-  const estacao = req.body;
-  const result = await EstacaoController.cadastrarEstacao(estacao);
-
-  if (result.success) {
-    res.status(201).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
-
-router.put("/estacao/atualizar/:id", async (req, res) => {
-  const estacaoId = req.params.id; // Captura o ID da estação da URL
-  const estacao = req.body; // Captura o corpo da requisição
-  const parametros = estacao.parametros; // Extraí os parâmetros do corpo da requisição
-
-  const result = await EstacaoController.atualizarEstacao({ ...estacao, id: estacaoId }, parametros); // Chama o controlador
-
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
 
 
 // Rota para deletar um parâmetro
@@ -105,18 +81,6 @@ router.post('/alerta/cadastro', async (req, res) => {
   } catch (error) {
       console.error('Erro ao cadastrar alerta:', error);
       res.status(500).json({ error: 'Erro ao cadastrar alerta' });
-  }
-});
-
-// Rota para deletar uma estação
-router.delete('/estacao/deletar/:id', async (req, res) => {
-  const id = parseInt(req.params.id);
-  const result = await EstacaoController.deletarEstacao(id);
-
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
   }
 });
 

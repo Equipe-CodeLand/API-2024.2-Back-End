@@ -15,7 +15,7 @@ export default class UsuarioController {
       const { id, ...dadosSemId } = dados;
       res.status(201).json({ id: novoUsuario.id, ...dadosSemId });
     } catch (erro) {
-        res.status(500).json({ erro: "Falha ao cadastrar categoria" });
+        res.status(500).json({ erro: "Falha ao cadastrar usuário" });
     }
   }
 
@@ -86,7 +86,7 @@ export default class UsuarioController {
       await colecaoUsuarios.doc(usuario.id).delete();
       res.status(204).end();
     } catch (erro) {
-        res.status(500).json({ erro: "Falha ao excluir categoria" });
+        res.status(500).json({ erro: "Falha ao excluir usuário" });
     }
   } 
 }

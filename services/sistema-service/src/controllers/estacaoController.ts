@@ -1,46 +1,138 @@
-/* import { log } from "node:console";
+import { Request, Response } from "express";
 import { Estacao } from "../interfaces/estacao";
-import selectMysql from "../middlewares/selectMysql"
-import ParametroController from "./parametroController";
-import insertMysql from "../middlewares/insertMysql";
-import updateMysql from "../middlewares/updateMysql";
-import deleteMysql from "../middlewares/deleteMysql";
+import { db } from "../config";
+
+const colecaoEstacao = db.collection("Estacao");
+const colecaoParametros = db.collection("Parametros");
 
 export default class EstacaoController {
 
-    static async buscarEstacoes() {
-        const tabela = "estacao";
-
+    static async cadastrarEstacao(req: Request, res: Response) {
         try {
-            const result = await selectMysql({ tabela }) as any;
-
-            // Verifique se o resultado é um array
-            if (Array.isArray(result) && result.length !== 0) {
-                // Processar cada estação
-                const estacoes = await Promise.all(result.map(async (estacao) => {
-                    // Buscar parâmetros e notificações da estação
-                    estacao.parametros = await ParametroController.buscarParametrosEstacao(estacao.id);
-                    estacao.status = await this.verificarAlertas(estacao.id);
-                    return estacao;
-                }));
-
-                return estacoes;
+            const dados: Estacao = req.body;
+    
+            // Verifica se o ID do parâmetro está presente
+            const parametroId = dados.parametroId;
+            if (!parametroId) {
+                console.log(parametroId)
+                return res.status(400).json({ erro: "ID do parâmetro é obrigatório." });
             }
-
-            // Caso não haja estações
-            return [];
+    
+            // Buscar o parâmetro pelo ID no Firestore
+            const parametroRef = colecaoParametros.doc(parametroId);
+            const parametroEncontrado = await parametroRef.get();
+    
+            if (!parametroEncontrado.exists) {
+                return res.status(404).json({ erro: "Parâmetro não encontrado." });
+            }
+    
+            // Se chegou aqui, o parâmetro foi encontrado
+            console.log('Parâmetro encontrado:', parametroEncontrado.data());
+    
+            // Criar referência para a nova estação
+            const novaEstacaoRef = colecaoEstacao.doc();
+            const novaEstacaoId = novaEstacaoRef.id;
+    
+            // Obter a data e hora atuais para os campos criadoEm e atualizadoEm
+            const timestampAtual = new Date().toISOString();
+    
+            // Gravar nova estação no Firestore
+            await novaEstacaoRef.set({
+                id: novaEstacaoId,
+                nome: dados.nome,
+                uid: dados.uid,
+                cep: dados.cep,
+                numero: dados.numero,
+                bairro: dados.bairro,
+                cidade: dados.cidade,
+                rua: dados.rua,
+                latitude: dados.latitude,
+                longitude: dados.longitude,
+                atualizadoEm: timestampAtual,
+                criadoEm: timestampAtual,
+                parametroId: parametroId, // ID do parâmetro vinculado
+            });
+    
+            // Retornar a resposta com o ID da nova estação e os dados da estação
+            const { id, ...dadosSemId } = dados;
+            return res.status(201).json({ id: novaEstacaoId, ...dadosSemId, criadoEm: timestampAtual, atualizadoEm: timestampAtual });
         } catch (error) {
-            console.error('Erro ao buscar estação:', error);
-            return {
-                success: false,
-                message: 'Erro ao buscar estação',
-                error
-            };
+            console.error("Erro ao cadastrar estação:", error);
+            return res.status(500).json({ erro: "Falha ao cadastrar estação." });
+        }
+    }
+    
+
+    static async buscarEstacoes(req: Request, res: Response) {
+        try {
+            const estacaoSnapshot = await colecaoEstacao.get();
+            const estacoes = estacaoSnapshot.docs.map( doc => ({
+                id: doc.id,
+                ...doc.data() as Omit<Estacao, 'id'>
+            }))
+
+            res.status(200).json(estacoes);
+        } catch (error) {
+            res.status(500).json({ erro: "Falha ao buscar estações" });
+        }
+    }
+    
+    static async buscarEstacaoPorId(req: Request, res: Response) {
+        try {
+            const estacaoId = req.params.id; //busca o id pela rota, e não pelo body
+            const estacaoRef = colecaoEstacao.doc(estacaoId);
+            const estacaoEncontrada = await estacaoRef.get();
+      
+            if (!estacaoEncontrada.exists) {
+              res.status(404).json({ erro: "Estação não encontrada" });
+              return;
+            }
+      
+            const dados = estacaoEncontrada.data();
+            res.status(200).json({ id: estacaoEncontrada.id, ...dados });
+        } catch (error) {
+            console.error("Erro ao buscar estação por ID:", error);
+            res.status(500).json({ erro: "Falha ao buscar estação" });
         }
     }
 
+    static async atualizarEstacao(req: Request, res: Response) {
+        try {
+            const dadosAtualizados = req.body;
+            console.log("Dados recebidos para atualização:", dadosAtualizados);
+        
+            if (!dadosAtualizados.id) {
+              res.status(400).json({ erro: "ID do estação é obrigatório" });
+              return;
+            }
+        
+            const estacaoRef = colecaoEstacao.doc(dadosAtualizados.id);
+            const estacaoAtualizada = await estacaoRef.get();
+        
+            if (!estacaoAtualizada.exists) {
+              res.status(404).json({ erro: "Estação não encontrado" });
+              return;
+            }
+        
+            await estacaoRef.update(dadosAtualizados);
+            res.status(200).json({ id: dadosAtualizados.id, ...dadosAtualizados });
+        } catch (erro) {
+            console.error("Erro ao atualizar estação:", erro); // Log completo do erro
+            res.status(500).json({ erro: "Falha ao editar estação" });
+        }
+    }
 
-    static async verificarAlertas(estacaoId: number) {
+    static async deletarEstacao(req: Request, res: Response){
+        try {
+          const estacao = req.body;
+          await colecaoEstacao.doc(estacao.id).delete();
+          res.status(204).end();
+        } catch (erro) {
+            res.status(500).json({ erro: "Falha ao excluir estação" });
+        }
+    } 
+
+    /* static async verificarAlertas(estacaoId: number) {
         const tabela = "notificacao n";
         const joins = `INNER JOIN alerta a ON a.id = n.alertaId INNER JOIN estacao e ON a.estacaoId = e.id`;
 
@@ -68,136 +160,5 @@ export default class EstacaoController {
                 error
             };
         }
-    }
-
-
-    // Função para cadastrar uma nova estacao
-    static async cadastrarEstacao(estacao: Estacao) {
-        const tabela = 'estacao'; // Nome da tabela no banco de dados
-        const colunas = ['nome', 'uid', 'cep', 'bairro', 'cidade', 'rua', 'numero']; // Colunas que vão ser inseridas
-        const valores = [
-            estacao.nome,
-            estacao.uid,
-            estacao.cep,
-            estacao.bairro,
-            estacao.cidade,
-            estacao.rua,
-            estacao.numero
-        ];
-
-        try {
-            const result: any = await insertMysql({ tabela, colunas, valores });
-            console.log('Estação inserido com sucesso');
-
-
-            await Promise.all(
-                estacao.parametros.map(async parametro => {
-                    return insertMysql({
-                        tabela: 'estacao_parametro',
-                        colunas: ['estacao_id', 'parametro_id'],
-                        valores: [result.insertId, parametro]
-                    });
-                })
-            );
-
-            return {
-                success: true,
-                message: 'Estação cadastrado com sucesso',
-                result: result
-            };
-        } catch (error) {
-            console.error('Erro ao cadastrar Estação:', error);
-            return {
-                success: false,
-                message: 'Erro ao cadastrar Estação',
-                error
-            };
-        }
-    }
-
-    static async buscarEstacaoPorId(id: number) {
-        const result = await selectMysql({ tabela: 'Estacao', where: `id = ${id}` });
-        return result
-    }
-
-    static async atualizarEstacao(estacao: Estacao, parametros: number[]) {
-        console.log('Estacao:', estacao);
-
-        // Verifica se a estação existe
-        if (estacao.id === undefined || (await this.buscarEstacaoPorId(estacao.id)).length === 0) {
-            return {
-                success: false,
-                message: 'Estação não encontrada',
-            };
-        }
-
-        const tabela = 'Estacao'; // Nome da tabela no banco de dados
-        const colunas = ['nome', 'uid', 'cep', 'numero', 'bairro', 'cidade', 'rua']; // Colunas que vão ser atualizadas
-        const valores = [
-            estacao.nome,
-            estacao.uid,
-            estacao.cep,
-            estacao.numero,
-            estacao.bairro,
-            estacao.cidade,
-            estacao.rua
-        ];
-
-        try {
-            // Atualiza os dados da estação
-            const result = await updateMysql({ tabela, colunas, valores, where: `id = ${estacao.id}` });
-            console.log('Estação atualizada com sucesso');
-
-            // Atualiza os parâmetros associados à estação na tabela de junção estacao_parametro
-            // Primeiro, remove todos os parâmetros antigos relacionados à estação
-            await deleteMysql({
-                tabela: 'estacao_parametro',
-                where: `estacao_id = ${estacao.id}`
-            });
-
-            // Em seguida, insere os novos parâmetros
-            for (const parametroId of parametros) {
-                await insertMysql({
-                    tabela: 'estacao_parametro',
-                    colunas: ['estacao_id', 'parametro_id'],
-                    valores: [estacao.id, parametroId]
-                });
-            }
-
-            return {
-                success: true,
-                message: 'Estação e parâmetros atualizados com sucesso',
-                insertId: result
-            };
-        } catch (error) {
-            console.error('Erro ao atualizar estação e parâmetros:', error);
-            return {
-                success: false,
-                message: 'Erro ao atualizar estação e parâmetros',
-                error
-            };
-        }
-    }
-
-    static async deletarEstacao(id: number) {
-        try {
-            // Deletar a estação com o id fornecido
-            const result = await deleteMysql({ tabela: 'Estacao', where: `id = ${id}` });
-            console.log('Estação deletada com sucesso');
-
-            return {
-                success: true,
-                message: 'Estação deletada com sucesso',
-                insertId: result
-            };
-        } catch (error) {
-            console.error('Erro ao deletar Estação:', error);
-            return {
-                success: false,
-                message: 'Erro ao deletar Estação',
-                error
-            };
-        }
-    }
+    }*/
 }
- */
