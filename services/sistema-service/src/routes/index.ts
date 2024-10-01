@@ -16,17 +16,9 @@ router.delete("/usuario/deletar", UsuarioController.deletarUsuario);
 // Rotas do CRUD de parâmetros
 router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
-/* router.get('/parametros', async (req, res) => {
-  const parametros = await ParametroController.buscarParametros()
+router.get('/parametros', ParametroController.buscarParametros)
 
-  if(parametros){
-    res.status(200).json(parametros)
-  } else {
-    res.status(500)
-  }
-})
-
-router.get('/parametro/estacao/:id', async (req,res) => {
+/* router.get('/parametro/estacao/:id', async (req,res) => {
   const idEstacao = parseInt(req.params.id)
   const parametros = await ParametroController.buscarParametrosEstacao(idEstacao)
 

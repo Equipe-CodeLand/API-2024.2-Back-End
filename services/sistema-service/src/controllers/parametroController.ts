@@ -20,32 +20,20 @@ export default class ParametroController {
   }
 
   // Função para buscar todos os parâmetros
-  /* static async buscarParametros() {
+  static async buscarParametros(req: Request, res: Response): Promise<void> {
     try {
-      // Seleciona todos os parâmetros da tabela "Parametro"
-      const result = await selectMysql({ tabela: 'Parametro' });
-      // Verifica se o resultado existe e contém dados
-      if (Array.isArray(result) && result.length > 0) {
-        return {
-          success: true,
-          parametros: result,
-        };
-      } else {
-        return {
-          success: false,
-          message: 'Nenhum parâmetro encontrado',
-        };
-      }
+      const parametrosSnapshot = await colecaoParametros.get();
+      const parametros = parametrosSnapshot.docs.map(doc => ({
+        id: doc.id, // ID gerado pelo Firestore
+        ...doc.data() as Omit<Parametro, 'id'>
+      }));
+
+      res.status(200).json(parametros);
     } catch (error) {
-      console.error('Erro ao buscar parâmetros:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetros',
-        error,
-      };
+      res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }
-  static async buscarParametrosEstacao(idEstacao: number) {
+  /* static async buscarParametrosEstacao(idEstacao: number) {
     try {
       const result = await selectMysql({
         select: 'select p.id, p.nome, p.unidade, p.fator, p.offset, p.descricao from ',
