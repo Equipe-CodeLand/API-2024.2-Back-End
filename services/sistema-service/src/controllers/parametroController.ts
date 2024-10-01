@@ -1,46 +1,26 @@
-import { connectToDatabase } from "../config";
+import { Request, Response } from "express";
+import { db } from "../config";
 import { Parametro } from "../interfaces/parametro";
-import deleteMysql from "../middlewares/deleteMysql";
-import insertMysql from "../middlewares/insertMysql";
-import selectMysql from "../middlewares/selectMysql";
-import updateMysql from "../middlewares/updateMysql";
+
+const colecaoParametros = db.collection("Parametros");
 
 export default class ParametroController {
 
   // Função para cadastrar um novo parâmetro
-  static async cadastrarParametro(parametro: Parametro) {
-    const tabela = 'Parametro'; // Nome da tabela no banco de dados
-    const colunas = ['nome', 'unidade', 'fator', 'offset', 'descricao']; // Colunas que vão ser inseridas
-    const valores = [
-      parametro.nome,
-      parametro.unidade,
-      parametro.fator,
-      parametro.offset,
-      parametro.descricao
-    ];
-
+  static async cadastrarParametro(req: Request, res: Response) {
     try {
-      // INSERÇÃO de um novo parâmetro no banco de dados
-      const result = await insertMysql({ tabela, colunas, valores });
-      console.log('Parâmetro inserido com sucesso');
+      const dados: Parametro = req.body;
+      const novoUsuario = await colecaoParametros.add(dados);
 
-      return {
-        success: true,
-        message: 'Parâmetro cadastrado com sucesso',
-        insertId: result
-      };
-    } catch (error) {
-      console.error('Erro ao cadastrar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao cadastrar parâmetro',
-        error
-      };
+      const { id, ...dadosSemId } = dados;
+      res.status(201).json({ id: novoUsuario.id, ...dadosSemId });
+    } catch (erro) {
+        res.status(500).json({ erro: "Falha ao cadastrar categoria" });
     }
   }
 
   // Função para buscar todos os parâmetros
-  static async buscarParametros() {
+  /* static async buscarParametros() {
     try {
       // Seleciona todos os parâmetros da tabela "Parametro"
       const result = await selectMysql({ tabela: 'Parametro' });
@@ -161,5 +141,5 @@ export default class ParametroController {
         error
       };
     }
-  }
-}
+  }*/
+} 

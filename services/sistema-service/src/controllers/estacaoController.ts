@@ -1,4 +1,4 @@
-import { log } from "node:console";
+/* import { log } from "node:console";
 import { Estacao } from "../interfaces/estacao";
 import selectMysql from "../middlewares/selectMysql"
 import ParametroController from "./parametroController";
@@ -200,3 +200,4 @@ export default class EstacaoController {
         }
     }
 }
+ */

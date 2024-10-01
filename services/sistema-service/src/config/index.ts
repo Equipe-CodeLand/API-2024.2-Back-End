@@ -1,17 +1,16 @@
-import mysql from 'mysql2/promise';
+import admin from "firebase-admin";
+import dotenv from "dotenv";
 
-export async function connectToDatabase() {
-  try {
-    const connection = await mysql.createConnection({
-      host: 'localhost',
-      user: 'root',
-      password: 'root',
-      database: 'api',
-    });
+dotenv.config();
 
-    return connection;
-  } catch (error) {
-    console.error('Erro ao conectar ao banco de dados MySQL:', error);
-    throw error; // Opcional: relançar o erro para ser tratado em outro lugar
-  }
-}
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  }),
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+});
+
+const db = admin.firestore();
+export { db };

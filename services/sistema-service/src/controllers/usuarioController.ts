@@ -1,132 +1,85 @@
-import { connectToDatabase } from "../config";
+import { Request, Response } from "express";
+import { db } from "../config";
 import { Usuario } from "../interfaces/usuario";
-import deleteMysql from "../middlewares/deleteMysql";
-import insertMysql from "../middlewares/insertMysql";
-import selectMysql from "../middlewares/selectMysql";
-import updateMysql from "../middlewares/updateMysql";
+
+const colecaoUsuarios = db.collection("Usuario");
 
 export default class UsuarioController {
 
   // Função para cadastrar um novo usuário
-  static async cadastrarUsuario(usuario: Usuario) {
-    const tabela = 'Usuario'; // Nome da tabela no banco de dados
-    const colunas = ['nome', 'email', 'senha', 'cpf', 'perfil']; // Colunas que vão ser inseridas
-    const valores = [
-      usuario.nome,
-      usuario.email,
-      usuario.senha,
-      usuario.cpf,
-      usuario.perfil ?? 'Leitor' // Valor padrão para perfil
-    ];
-
+  static async cadastrarUsuario(req: Request, res: Response) {
     try {
-      // INSERÇÃO de um novo usuário no banco de dados
-      const result = await insertMysql({ tabela, colunas, valores });
-      console.log('Usuário inserido com sucesso');
-      
-      return {
-        success: true,
-        message: 'Usuário cadastrado com sucesso',
-        insertId: result
-      };
-    } catch (error) {
-      console.error('Erro ao cadastrar usuário:', error);
-      return {
-        success: false,
-        message: 'Erro ao cadastrar usuário',
-        error
-      };
+      const dados: Usuario = req.body;
+      const novoUsuario = await colecaoUsuarios.add(dados);
+
+      const { id, ...dadosSemId } = dados;
+      res.status(201).json({ id: novoUsuario.id, ...dadosSemId });
+    } catch (erro) {
+        res.status(500).json({ erro: "Falha ao cadastrar categoria" });
     }
   }
 
-  static async buscarUsuarios() {
+  static async buscarUsuarios(req: Request, res: Response): Promise<void> {
     try {
-      // Seleciona todos os usuários da tabela "Usuario"
-      const result = await selectMysql({ tabela: 'Usuario' });
-  
-      // Verifica se o resultado existe e contém dados
-      if (Array.isArray(result) && result.length > 0) {
-        return {
-          success: true,
-          usuarios: result,
-        };
-      } else {
-        return {
-          success: false,
-          message: 'Nenhum usuário encontrado',
-        };
-      }
+      const usuariosSnapshot = await colecaoUsuarios.get();
+      const usuarios = usuariosSnapshot.docs.map(doc => ({
+        id: doc.id, // ID gerado pelo Firestore
+        ...doc.data() as Omit<Usuario, 'id'>
+    }));
+
+    res.status(200).json(usuarios);
     } catch (error) {
-      console.error('Erro ao buscar usuários:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar usuários',
-        error,
-      };
+      res.status(500).json({ erro: "Falha ao listar usuários" });
     }
   }  
 
-  static async buscarUsuarioPorId(id: number){
-    const result = await selectMysql({ tabela: 'Usuario', where: `id = ${id}` });
-    return result
-  }
-
-  static async atualizarUsuario(usuario: Usuario){
-    console.log('Usuario:', usuario);
-    if (usuario.id === undefined || (await this.buscarUsuarioPorId(usuario.id)).length === 0) {
-      return {
-        success: false,
-        message: 'Usuário não encontrado',
-      };
-    }
-    const tabela = 'Usuario'; // Nome da tabela no banco de dados
-    const colunas = ['nome', 'email', 'senha', 'cpf', 'perfil']; // Colunas que vão ser atualizadas
-    const valores = [
-      usuario.nome,
-      usuario.email,
-      usuario.senha,
-      usuario.cpf,
-      usuario.perfil ?? 'Leitor' // Valor padrão para perfil
-    ];
-
+  static async buscarUsuarioPorId(req: Request, res: Response): Promise<void> {
     try {
-      // ATUALIZAÇÃO de um usuário no banco de dados
-      const result = await updateMysql({ tabela, colunas, valores, where: `id = ${usuario.id}` });
-      console.log('Usuário atualizado com sucesso');
-      
-      return {
-        success: true,
-        message: 'Usuário atualizado com sucesso',
-        insertId: result
-      };
+      const usuariosSnapshot = await colecaoUsuarios.get();
+      const usuarios = usuariosSnapshot.docs.map(doc => ({
+        id: doc.id, // ID gerado pelo Firestore
+        ...doc.data() as Omit<Usuario, 'id'>
+    }));
+
+    res.status(200).json(usuarios);
     } catch (error) {
-      console.error('Erro ao atualizar usuário:', error);
-      return {
-        success: false,
-        message: 'Erro ao atualizar usuário',
-        error
-      };
+      res.status(500).json({ erro: "Falha ao listar usuários" });
     }
   }
 
-  static async deletarUsuario(id: number){
-    try {
-      // DELEÇÃO de um usuário no banco de dados
-      const result = await deleteMysql({ tabela: 'Usuario', where: `id = ${id}` });
-      console.log('Usuário deletado com sucesso');
-      
-      return {
-        success: true,
-        message: 'Usuário deletado com sucesso',
-        insertId: result
-      };
-    } catch (error) {
-      console.error('Erro ao deletar usuário:', error);
-      return {
-        success: false,
-        message: 'Erro ao deletar usuário',
-        error
-      };
-    }
+    static async atualizarUsuario(req: Request, res: Response) {
+      try {
+          const dadosAtualizados = req.body;
+          console.log("Dados recebidos para atualização:", dadosAtualizados);
+  
+          if (!dadosAtualizados.id) {
+              res.status(400).json({ erro: "ID do usuário é obrigatório" });
+              return;
+          }
+  
+          const usuarioRef = colecaoUsuarios.doc(dadosAtualizados.id);
+          const usuarioAtualizado = await usuarioRef.get();
+  
+          if (!usuarioAtualizado.exists) {
+              res.status(404).json({ erro: "Usuário não encontrado" });
+              return;
+          }
+  
+          await usuarioRef.update(dadosAtualizados);
+          res.status(200).json({ id: dadosAtualizados.id, ...dadosAtualizados });
+      } catch (erro) {
+          console.error("Erro ao atualizar usuário:", erro); // Log completo do erro
+          res.status(500).json({ erro: "Falha ao editar usuário" });
+      }
   }
+
+  static async deletarUsuario(req: Request, res: Response){
+    try {
+      const usuario = req.body;
+      await colecaoUsuarios.doc(usuario.id).delete();
+      res.status(204).end();
+    } catch (erro) {
+        res.status(500).json({ erro: "Falha ao excluir categoria" });
+    }
+  } 
 }

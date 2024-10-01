@@ -1,48 +1,22 @@
 import { Router } from "express";
 import UsuarioController from "../controllers/usuarioController";
-import EstacaoController from "../controllers/estacaoController";
 import ParametroController from "../controllers/parametroController";
-import AlertaController from "../controllers/alertaController";
-import obterAlertas from "../controllers/alertaController";
-import deletarAlerta from "../controllers/alertaController"
 
 const router = Router();
 
-// Rota para cadastrar um usuário
-router.post('/usuario/cadastro', async (req, res) => {
-  const usuario = req.body;
-  const result = await UsuarioController.cadastrarUsuario(usuario);
+// Rotas do CRUD do usuário
+router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario); 
 
-  if (result.success) {
-    res.status(201).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
+router.get('/usuarios', UsuarioController.buscarUsuarioPorId);
 
-router.get('/usuarios', async (req, res) => {
-  const result = await UsuarioController.buscarUsuarios();
+router.put("/usuario/atualizar", UsuarioController.atualizarUsuario);
 
-  if (result.success) {
-    res.status(200).json(result.usuarios); // Certifique-se de que 'result.usuarios' é um array
-  } else {
-    res.status(500).json(result);
-  }
-});
+router.delete("/usuario/deletar", UsuarioController.deletarUsuario);
 
-// Rota para cadastrar um parâmetro
-router.post('/parametro/cadastro', async (req, res) => {
-  const parametro = req.body; // Parâmetros recebidos do frontend
-  const result = await ParametroController.cadastrarParametro(parametro);
+// Rotas do CRUD de parâmetros
+router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
-  if (result.success) {
-    res.status(201).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
-
-router.get('/parametros', async (req, res) => {
+/* router.get('/parametros', async (req, res) => {
   const parametros = await ParametroController.buscarParametros()
 
   if(parametros){
@@ -103,30 +77,6 @@ router.put("/estacao/atualizar/:id", async (req, res) => {
 router.delete('/parametro/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   const result = await ParametroController.deletarParametro(id);
-
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
-
-// Rota para atualizar usuário
-router.put("/usuario/atualizar", async (req, res) => {
-  const usuario = req.body;
-  const result = await UsuarioController.atualizarUsuario(usuario);
-
-  if (result.success) {
-    res.status(200).json(result);
-  } else {
-    res.status(500).json(result);
-  }
-});
-
-// Rota para deletar usuário
-router.delete("/usuario/deletar", async (req, res) => {
-  const { id } = req.body;
-  const result = await UsuarioController.deletarUsuario(id);
 
   if (result.success) {
     res.status(200).json(result);
@@ -234,7 +184,7 @@ router.put("/alerta/atualizar/:id", async (req, res) => {
     console.error("Erro ao atualizar alerta:", error);
     res.status(500).json({ success: false, message: 'Erro interno do servidor' });
   }
-});
+}); */
 
 
 export default router;

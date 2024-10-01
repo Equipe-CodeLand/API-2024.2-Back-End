@@ -1,4 +1,4 @@
-import { Alerta } from "../interfaces/alerta";
+/* import { Alerta } from "../interfaces/alerta";
 import insertMysql from "../middlewares/insertMysql";
 import { TipoAlerta, Condicao } from "../enums/alertaEnum";
 import deleteMysql from "../middlewares/deleteMysql";
@@ -181,3 +181,4 @@ export default class AlertaController {
 
 
 }
+ */
