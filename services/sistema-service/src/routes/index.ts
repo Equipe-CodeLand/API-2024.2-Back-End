@@ -9,6 +9,8 @@ router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario);
 
 router.get('/usuarios', UsuarioController.buscarUsuarios);
 
+router.get('/usuario/:id', UsuarioController.buscarUsuarioPorId);
+
 router.put("/usuario/atualizar", UsuarioController.atualizarUsuario);
 
 router.delete("/usuario/deletar", UsuarioController.deletarUsuario);
@@ -19,7 +21,7 @@ router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
 router.get('/parametros', ParametroController.buscarParametros)
 
-router.put('/parametro/atualizar', ParametroController.atualizarParametro);
+router.put('/parametro/atualizar/:id', ParametroController.atualizarParametro);
 
 router.delete('/parametro/:id', ParametroController.deletarParametro);
 

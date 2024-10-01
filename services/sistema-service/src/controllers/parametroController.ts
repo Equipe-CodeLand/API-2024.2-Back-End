@@ -95,8 +95,8 @@ export default class ParametroController {
   // Função para deletar um parâmetro
   static async deletarParametro(req: Request, res: Response) {
     try {
-      const parametroId = req.body;
-      await colecaoParametros.doc(parametroId.id).delete();
+      const parametroId = req.params.id;
+      await colecaoParametros.doc(parametroId).delete();
 
       res.status(200).json({ success: true, message: 'Parâmetro deletado com sucesso' });
     } catch (error) {

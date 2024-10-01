@@ -33,17 +33,26 @@ export default class UsuarioController {
     }
   }  
 
+ 
   static async buscarUsuarioPorId(req: Request, res: Response): Promise<void> {
     try {
-      const usuarioId = req.body;
-      const usuarioRef = colecaoUsuarios.doc(usuarioId.id);
+      const usuarioId = req.params.id; //busca o id pela rota, e não pelo body
+      const usuarioRef = colecaoUsuarios.doc(usuarioId);
       const usuarioEncontrado = await usuarioRef.get();
 
-    res.status(200).json(usuarioEncontrado);
+      if (!usuarioEncontrado.exists) {
+        res.status(404).json({ erro: "Usuário não encontrado" });
+        return;
+      }
+
+      const dados = usuarioEncontrado.data();
+      res.status(200).json({ id: usuarioEncontrado.id, ...dados });
     } catch (error) {
-      res.status(500).json({ erro: "Falha ao listar usuários" });
+      console.error("Erro ao buscar usuário por ID:", error);
+      res.status(500).json({ erro: "Falha ao buscar usuário" });
     }
   }
+
 
   static async atualizarUsuario(req: Request, res: Response) {
     try {
