@@ -1,9 +1,9 @@
 import { TipoAlerta, Condicao } from "../enums/alertaEnum"; // Importar os enums
 
 export interface Alerta {
-    id: number;
-    estacaoId: number;
-    parametroId: number;
+    id: string;
+    estacaoId: string;
+    parametroId: string;
     mensagemAlerta: string;
     tipoAlerta: TipoAlerta;
     condicao: Condicao;      

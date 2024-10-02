@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../config";
 import { Parametro } from "../interfaces/parametro";
+import { Estacao } from "../interfaces/estacao";
 
 const colecaoParametros = db.collection("Parametros");
 
@@ -33,24 +34,6 @@ export default class ParametroController {
       res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }
-  /* static async buscarParametrosEstacao(idEstacao: number) {
-    try {
-      const result = await selectMysql({
-        select: 'select p.id, p.nome, p.unidade, p.fator, p.offset, p.descricao from ',
-        tabela: 'parametro p',
-        joins: ` INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id INNER JOIN estacao e ON ep.estacao_id = e.id`,
-        where: `e.id = ${idEstacao}`
-      });
-      return result
-    } catch (error) {
-      console.error('Erro ao buscar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetro',
-        error
-      };
-    }
-  }*/
 
   // Função para buscar um parâmetro por ID
   static async buscarParametroPorId(req: Request, res: Response): Promise<void> {
