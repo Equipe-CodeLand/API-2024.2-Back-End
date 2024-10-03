@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { db } from "../config";
 import { Parametro } from "../interfaces/parametro";
-import { Estacao } from "../interfaces/estacao";
 
 const colecaoParametros = db.collection("Parametros");
 
@@ -11,10 +10,32 @@ export default class ParametroController {
   static async cadastrarParametro(req: Request, res: Response) {
     try {
       const dados: Parametro = req.body;
-      const novoUsuario = await colecaoParametros.add(dados);
+      const novoParametro = await colecaoParametros.add(dados);
+
+      // Obter a data e hora atuais
+      const dataAtual = new Date();
+      const dia = String(dataAtual.getDate()).padStart(2, '0');
+      const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
+      const ano = dataAtual.getFullYear();
+      const horas = String(dataAtual.getHours()).padStart(2, '0');
+      const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
+      const segundos = String(dataAtual.getSeconds()).padStart(2, '0');
+      
+      const timestampFormatado = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+
+      await novoParametro.set({
+        id: novoParametro.id,
+        nome: dados.nome,
+        unidade: dados.unidade,
+        fator: dados.fator,
+        offset: dados.offset,
+        descricao: dados.descricao,
+        criadoEm: timestampFormatado,
+        atualizadoEm: timestampFormatado,
+      })
 
       const { id, ...dadosSemId } = dados;
-      res.status(201).json({ id: novoUsuario.id, ...dadosSemId });
+      res.status(201).json({ id: novoParametro.id, ...dadosSemId });
     } catch (erro) {
         res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
     }

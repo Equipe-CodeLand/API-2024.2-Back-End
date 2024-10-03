@@ -38,8 +38,16 @@ export default class EstacaoController {
             const novaEstacaoRef = colecaoEstacao.doc();
             const novaEstacaoId = novaEstacaoRef.id;
 
-            // Obter a data e hora atuais para os campos criadoEm e atualizadoEm
-            const timestampAtual = new Date().toISOString();
+            // Obter a data e hora atuais
+            const dataAtual = new Date();
+            const dia = String(dataAtual.getDate()).padStart(2, '0');
+            const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
+            const ano = dataAtual.getFullYear();
+            const horas = String(dataAtual.getHours()).padStart(2, '0');
+            const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
+            const segundos = String(dataAtual.getSeconds()).padStart(2, '0');
+            
+            const timestampFormatado = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
 
             // Gravar nova estação no Firestore
             await novaEstacaoRef.set({
@@ -53,15 +61,15 @@ export default class EstacaoController {
                 rua: dados.rua,
                 latitude: dados.latitude || null,
                 longitude: dados.longitude || null,
-                atualizadoEm: timestampAtual,
-                criadoEm: timestampAtual,
+                atualizadoEm: timestampFormatado,
+                criadoEm: timestampFormatado,
                 parametros: parametros, // IDs dos parâmetros vinculados
             });
 
             // Retornar a resposta com o ID da nova estação e os dados da estação
             const { id, ...dadosSemId } = dados;
             console.log("cadastro feito com sucesso")
-            return res.status(201).json({ id: novaEstacaoId, ...dadosSemId, parametros, criadoEm: timestampAtual, atualizadoEm: timestampAtual });
+            return res.status(201).json({ id: novaEstacaoId, ...dadosSemId, parametros, criadoEm: timestampFormatado, atualizadoEm: timestampFormatado });
         } catch (error) {
             console.error("Erro ao cadastrar estação:", error);
             return res.status(500).json({ erro: "Falha ao cadastrar estação." });
@@ -141,34 +149,4 @@ export default class EstacaoController {
             console.log("Falha ao excluir estação");
         }
     }
-
-    /* static async verificarAlertas(estacaoId: number) {
-        const tabela = "notificacao n";
-        const joins = `INNER JOIN alerta a ON a.id = n.alertaId INNER JOIN estacao e ON a.estacaoId = e.id`;
-
-        // Calcular a data de 24 horas atrás
-        const hoje = new Date();
-        const milissegundos = 97200000;
-        const ontem = new Date(hoje.getTime() - milissegundos);
-
-        // Formatar a data de 'ontem' no formato SQL (YYYY-MM-DD HH:MM:SS)
-        const ontemISO = ontem.toISOString().slice(0, 19).replace('T', ' ');
-
-        const where = `a.estacaoId = ${estacaoId} AND n.dataNotificacao > '${ontemISO}'`;
-
-        try {
-            const result = await selectMysql({ tabela, where, joins });
-            if (Array.isArray(result) && result.length > 0) {
-                return 'Alerta';
-            }
-            return 'Ok';
-        } catch (error) {
-            console.error('Erro ao buscar alertas:', error);
-            return {
-                success: false,
-                message: 'Erro ao buscar alertas',
-                error
-            };
-        }
-    }*/
 }

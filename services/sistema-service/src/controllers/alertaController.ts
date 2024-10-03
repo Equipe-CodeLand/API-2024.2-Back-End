@@ -4,81 +4,43 @@ import { db } from "../config";
 import { Request, Response } from "express";
 import isValorEnum from "../middleware/verificadorDadosJsonParaEnum";
 import NotificacaoController from "./notificacaoController";
+import { buscarValorParametro } from "../middleware/buscarValorParametro";
+import { verificarCondicao } from "../middleware/verificadorCondicaoAlerta";
 
 const colecaoAlerta = db.collection('Alerta');
-const colecaoParametros = db.collection("Parametros");
-
-// Função para buscar o valor do parâmetro atual
-async function buscarValorParametro(parametroId: string) {
-    console.log(`Buscando valor para o parametroId: ${parametroId}`);
-    try {
-        const parametroRef = colecaoParametros.doc(parametroId);
-        const parametroEncontrado = await parametroRef.get();
-
-        if (!parametroEncontrado.exists) {
-            console.error("Parâmetro não encontrado");
-            return null;
-        }
-
-        const dadosParametro = parametroEncontrado.data();
-
-        console.log(`Dados do parâmetro encontrados: ${JSON.stringify(dadosParametro)}`);
-
-        if (!dadosParametro || typeof dadosParametro.fator === 'undefined') {
-            console.error("Valor do parâmetro não encontrado ou está indefinido");
-            return null;
-        }
-
-        console.log(`Valor do fator encontrado: ${dadosParametro.fator}`);
-
-        return dadosParametro.fator;
-    } catch (error) {
-        console.error("Erro ao buscar valor do parâmetro:", error);
-        return null;
-    }
-}
-
-// Função para verificar a condição do alerta com base no valor do parâmetro atual
-function verificarCondicao(valorAtual: number, valorAlerta: number, condicao: Condicao): boolean {
-    switch (condicao) {
-        case Condicao.Maior:
-            return valorAtual > valorAlerta;
-        case Condicao.Menor:
-            return valorAtual < valorAlerta;
-        case Condicao.MaiorIgual:
-            return valorAtual >= valorAlerta;
-        case Condicao.MenorIgual:
-            return valorAtual <= valorAlerta;
-        case Condicao.Igual:
-            return valorAtual === valorAlerta;
-        default:
-            return false;
-    }
-}
-
 export default class AlertaController {
 
     // Função para cadastrar o alerta
     static async cadastrarAlerta(req: Request, res: Response) {
         const { estacaoId, parametroId, mensagemAlerta, tipoAlerta, condicao, valor } = req.body;
-
+    
         try {
             // Verifica se os dados necessários estão presentes
             if (!estacaoId || !parametroId) {
                 return res.status(400).json({ erro: "ID da estação e do parâmetro são obrigatórios." });
             }
-
+    
             // Buscar o fator atual do parâmetro
             const fator = await buscarValorParametro(parametroId);
             if (fator === null) {
                 return res.status(400).json({ erro: "Fator não encontrado." });
             }
-
+    
             // Cadastrar o alerta no Firestore
             const novoAlertaRef = colecaoAlerta.doc();
             const novoAlertaId = novoAlertaRef.id;
-            const timestampAtual = new Date().toISOString();
-
+            
+            // Obter a data e hora atuais
+            const dataAtual = new Date();
+            const dia = String(dataAtual.getDate()).padStart(2, '0');
+            const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
+            const ano = dataAtual.getFullYear();
+            const horas = String(dataAtual.getHours()).padStart(2, '0');
+            const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
+            const segundos = String(dataAtual.getSeconds()).padStart(2, '0');
+            
+            const timestampFormatado = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+    
             await novoAlertaRef.set({
                 id: novoAlertaId,
                 estacaoId,
@@ -87,18 +49,18 @@ export default class AlertaController {
                 tipoAlerta,
                 condicao,
                 valor,
-                criadoEm: timestampAtual,
-                atualizadoEm: timestampAtual,
+                criadoEm: timestampFormatado,
+                atualizadoEm: timestampFormatado,
             });
-
+    
             // Buscar o valor atual do parâmetro da estação
             const parametroAtual = await buscarValorParametro(parametroId);
             console.log(`Parâmetro atual: ${parametroAtual}`);
-
+    
             if (parametroAtual === null || parametroAtual === undefined) {
                 return res.status(400).json({ erro: "Parâmetro atual não encontrado." });
             }
-
+    
             // Verificar se o alerta é ativado
             const alertaAtivado = verificarCondicao(parametroAtual, valor, condicao);
             if (alertaAtivado) {
@@ -111,17 +73,16 @@ export default class AlertaController {
                         estacaoId
                     },
                 } as Request, res);
-
+    
                 if (resultadoNotificacao?.status && typeof resultadoNotificacao.status === 'number') {
                     console.log("Notificação cadastrada com sucesso:", resultadoNotificacao);
                 } else {
-                    console.error("Erro ao cadastrar notificação:", resultadoNotificacao);
                     if (!res.headersSent) {
                         return res.status(500).json({ erro: "Erro ao cadastrar notificação." });
                     }
                 }
             }
-
+    
             if (!res.headersSent) {
                 return res.status(201).json({
                     id: novoAlertaId,
@@ -131,8 +92,8 @@ export default class AlertaController {
                     tipoAlerta,
                     condicao,
                     valor,
-                    criadoEm: timestampAtual,
-                    atualizadoEm: timestampAtual,
+                    criadoEm: timestampFormatado,
+                    atualizadoEm: timestampFormatado,
                 });
             }
         } catch (erro) {

@@ -48,8 +48,10 @@ router.put("/alerta/atualizar", AlertaController.atualizarAlerta);
 
 router.delete('/alerta/deletar', AlertaController.deletarAlerta);
 
-router.post('/notificacao/cadastro', NotificacaoController.cadastrarNotificacao)
+// Rotas do CRUD de notificação
+router.get('/notificacoes', NotificacaoController.obterNotificacoes);
 
+router.get('/notificacao/estacao', NotificacaoController.buscarNotificacaoPorEstacao);
 /* 
 
 router.get('/estacao/alerta/:id', async (req, res) => {

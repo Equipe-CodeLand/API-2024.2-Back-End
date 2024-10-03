@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../config";
 import { Usuario } from "../interfaces/usuario";
+import { Perfil } from "../enums/usuarioEnum";
 
 const colecaoUsuarios = db.collection("Usuario");
 
@@ -10,7 +11,35 @@ export default class UsuarioController {
   static async cadastrarUsuario(req: Request, res: Response) {
     try {
       const dados: Usuario = req.body;
+
+      // Verifica se o perfil é válido
+      if (!dados.perfil || !Object.values(Perfil).includes(dados.perfil)) {
+        return res.status(400).json({ erro: "Perfil inválido." });
+      }
+
       const novoUsuario = await colecaoUsuarios.add(dados);
+
+      // Obter a data e hora atuais
+      const dataAtual = new Date();
+      const dia = String(dataAtual.getDate()).padStart(2, '0');
+      const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
+      const ano = dataAtual.getFullYear();
+      const horas = String(dataAtual.getHours()).padStart(2, '0');
+      const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
+      const segundos = String(dataAtual.getSeconds()).padStart(2, '0');
+      
+      const timestampFormatado = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
+
+      await novoUsuario.set({
+        id: novoUsuario,
+        nome: dados.nome,
+        email: dados.email,
+        senha: dados.senha,
+        cpf: dados.cpf,
+        perfil: dados.perfil,
+        criadoEm: timestampFormatado,
+        atualizadoEm: timestampFormatado,
+      })
 
       const { id, ...dadosSemId } = dados;
       res.status(201).json({ id: novoUsuario.id, ...dadosSemId });
