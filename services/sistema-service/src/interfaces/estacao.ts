@@ -1,4 +1,4 @@
-export interface Estacao{
+export interface Estacao {
     id: string,
     nome: string,
     uid: string,
@@ -11,5 +11,5 @@ export interface Estacao{
     longitude: string,
     atualizadoEm: string,
     criadoEm: string,
-    parametroId: string,
+    parametros: string[], 
 }

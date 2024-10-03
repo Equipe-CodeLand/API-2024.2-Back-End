@@ -36,7 +36,7 @@ router.get('/estacoes', EstacaoController.buscarEstacoes);
 
 router.put("/estacao/atualizar", EstacaoController.atualizarEstacao);
 
-router.delete('/estacao/deletar', EstacaoController.deletarEstacao);
+router.delete('/estacao/deletar/:id', EstacaoController.deletarEstacao);
 
 
 // Rotas do CRUD de alertas
