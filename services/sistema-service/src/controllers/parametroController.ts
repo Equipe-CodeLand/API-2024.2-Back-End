@@ -21,7 +21,7 @@ export default class ParametroController {
   }
 
   // Função para buscar todos os parâmetros
-  static async buscarParametros(req: Request, res: Response): Promise<void> {
+  static async buscarParametros(req: Request, res: Response) {
     try {
       const parametrosSnapshot = await colecaoParametros.get();
       const parametros = parametrosSnapshot.docs.map(doc => ({

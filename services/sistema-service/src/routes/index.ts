@@ -3,6 +3,7 @@ import UsuarioController from "../controllers/usuarioController";
 import ParametroController from "../controllers/parametroController";
 import EstacaoController from "../controllers/estacaoController";
 import AlertaController from "../controllers/alertaController";
+import NotificacaoController from "../controllers/notificacaoController";
 
 const router = Router();
 
@@ -46,6 +47,8 @@ router.get('/alertas', AlertaController.obterAlertas);
 router.put("/alerta/atualizar", AlertaController.atualizarAlerta);
 
 router.delete('/alerta/deletar', AlertaController.deletarAlerta);
+
+router.post('/notificacao/cadastro', NotificacaoController.cadastrarNotificacao)
 
 /* 
 
