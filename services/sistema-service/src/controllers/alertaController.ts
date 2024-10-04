@@ -6,6 +6,7 @@ import isValorEnum from "../middleware/verificadorDadosJsonParaEnum";
 import NotificacaoController from "./notificacaoController";
 import { buscarValorParametro } from "../middleware/buscarValorParametro";
 import { verificarCondicao } from "../middleware/verificadorCondicaoAlerta";
+import TimestampFormatado from "../middleware/timestampFormatado";
 
 const colecaoAlerta = db.collection('Alerta');
 export default class AlertaController {
@@ -15,7 +16,7 @@ export default class AlertaController {
         const { estacaoId, parametroId, mensagemAlerta, tipoAlerta, condicao, valor } = req.body;
     
         try {
-            // Verifica se os dados necessários estão presentes
+            // Verifica se o id da estação e do parâmetro estão presentes
             if (!estacaoId || !parametroId) {
                 return res.status(400).json({ erro: "ID da estação e do parâmetro são obrigatórios." });
             }
@@ -26,21 +27,11 @@ export default class AlertaController {
                 return res.status(400).json({ erro: "Fator não encontrado." });
             }
     
-            // Cadastrar o alerta no Firestore
+            // Criação uma nova referência de documento na coleção 'colecaoAlerta' no Firestore e pegando o id do alerta
             const novoAlertaRef = colecaoAlerta.doc();
             const novoAlertaId = novoAlertaRef.id;
-            
-            // Obter a data e hora atuais
-            const dataAtual = new Date();
-            const dia = String(dataAtual.getDate()).padStart(2, '0');
-            const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
-            const ano = dataAtual.getFullYear();
-            const horas = String(dataAtual.getHours()).padStart(2, '0');
-            const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
-            const segundos = String(dataAtual.getSeconds()).padStart(2, '0');
-            
-            const timestampFormatado = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
     
+            // Cadastrar o alerta no Firestore
             await novoAlertaRef.set({
                 id: novoAlertaId,
                 estacaoId,
@@ -49,14 +40,15 @@ export default class AlertaController {
                 tipoAlerta,
                 condicao,
                 valor,
-                criadoEm: timestampFormatado,
-                atualizadoEm: timestampFormatado,
+                criadoEm: TimestampFormatado(), // Formatação da data e hora atual (função no middleware)
+                atualizadoEm: TimestampFormatado(), // Formatação da data e hora atual (função no middleware)
             });
     
             // Buscar o valor atual do parâmetro da estação
             const parametroAtual = await buscarValorParametro(parametroId);
             console.log(`Parâmetro atual: ${parametroAtual}`);
     
+            // Verificar se o parâmetro atual foi encontrado
             if (parametroAtual === null || parametroAtual === undefined) {
                 return res.status(400).json({ erro: "Parâmetro atual não encontrado." });
             }
@@ -74,6 +66,7 @@ export default class AlertaController {
                     },
                 } as Request, res);
     
+                // Verificar se a notificação foi cadastrada com sucesso
                 if (resultadoNotificacao?.status && typeof resultadoNotificacao.status === 'number') {
                     console.log("Notificação cadastrada com sucesso:", resultadoNotificacao);
                 } else {
@@ -83,6 +76,7 @@ export default class AlertaController {
                 }
             }
     
+            // Retornar o alerta cadastrado
             if (!res.headersSent) {
                 return res.status(201).json({
                     id: novoAlertaId,
@@ -92,8 +86,8 @@ export default class AlertaController {
                     tipoAlerta,
                     condicao,
                     valor,
-                    criadoEm: timestampFormatado,
-                    atualizadoEm: timestampFormatado,
+                    criadoEm: TimestampFormatado(),
+                    atualizadoEm: TimestampFormatado(),
                 });
             }
         } catch (erro) {
@@ -107,14 +101,15 @@ export default class AlertaController {
     // Função para obter todos os alertas
     static async obterAlertas(req: Request, res: Response) {
         try {
-            const alertas = await colecaoAlerta.get();
-            const listaAlertas: Alerta[] = [];
+            const alertas = await colecaoAlerta.get(); // Buscar todos os alertas
+            const listaAlertas: Alerta[] = []; // Lista de alertas
 
+            // Adicionar os alertas na lista
             alertas.forEach((alerta) => {
                 listaAlertas.push(alerta.data() as Alerta);
             });
 
-            return res.status(200).json(listaAlertas);
+            return res.status(200).json(listaAlertas); // Retornar a lista de alertas
         } catch (erro) {
             console.error("Erro ao buscar alertas:", erro);
             return res.status(500).json({ erro: "Erro ao buscar alertas" });
@@ -124,10 +119,11 @@ export default class AlertaController {
     // Função para obter os alertas por estação
     static async obterAlertaPorEstacao(req: Request, res: Response) {
         try {
-            const estacaoId = req.params.id;
-            const alertas = await colecaoAlerta.where('estacaoId', '==', estacaoId).get();
-            const listaAlertas: Alerta[] = [];
+            const estacaoId = req.params.id; // ID da estação
+            const alertas = await colecaoAlerta.where('estacaoId', '==', estacaoId).get(); // Buscar os alertas da estação
+            const listaAlertas: Alerta[] = []; // Lista de alertas
 
+            // Adicionar os alertas na lista
             alertas.forEach((alerta) => {
                 listaAlertas.push(alerta.data() as Alerta);
             });
@@ -142,12 +138,13 @@ export default class AlertaController {
     // Função para atualizar os alertas
     static async atualizarAlerta(req: Request, res: Response) {
         try {
-            const alertaId = req.body.id;
-            const alerta = req.body;
+            const alertaId = req.body.id; // ID do alerta
+            const alerta = req.body; // Alerta
     
             // Buscar o alerta no banco de dados
             const alertaDoc = await colecaoAlerta.doc(alertaId).get();
     
+            // Verifica se o alerta foi encontrado
             if (!alertaDoc.exists) {
                 return res.status(404).json({ erro: "Alerta não encontrado" });
             }
@@ -174,9 +171,6 @@ export default class AlertaController {
                 return res.status(400).json({ erro: "Condição inválida." });
             }
     
-            // Obter a data e hora atuais para o campo atualizadoEm
-            const timestampAtual = new Date().toISOString();
-    
             // Atualizar o alerta no banco de dados
             await colecaoAlerta.doc(alertaId).update({
                 estacaoId: estacaoId,
@@ -186,7 +180,7 @@ export default class AlertaController {
                 condicao: alerta.condicao,
                 valor: alerta.valor,
                 criadoEm: alerta.criadoEm,
-                atualizadoEm: timestampAtual,
+                atualizadoEm: TimestampFormatado(),
             });
     
             return res.status(200).json({ message: 'Alerta atualizado com sucesso' });
@@ -199,8 +193,8 @@ export default class AlertaController {
     // Função para deletar por estação
     static async deletarAlerta(req: Request, res: Response) {
         try {
-            const alertaId = req.body.id;
-            await colecaoAlerta.doc(alertaId).delete();
+            const alertaId = req.body.id; // ID do alerta
+            await colecaoAlerta.doc(alertaId).delete(); // Deletar o alerta
 
             return res.status(200).json({ message: 'Alerta deletado com sucesso' });
         } catch (erro) {

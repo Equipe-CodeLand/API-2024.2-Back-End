@@ -48,24 +48,12 @@ router.put("/alerta/atualizar", AlertaController.atualizarAlerta);
 
 router.delete('/alerta/deletar', AlertaController.deletarAlerta);
 
+
 // Rotas do CRUD de notificação
 router.get('/notificacoes', NotificacaoController.obterNotificacoes);
 
 router.get('/notificacao/estacao', NotificacaoController.buscarNotificacaoPorEstacao);
-/* 
 
-router.get('/estacao/alerta/:id', async (req, res) => {
-  const id = parseInt(req.params.id)
-
-  try {
-    const alerta = await EstacaoController.verificarAlertas(id)
-    res.status(200).json(alerta)
-  } catch (error) {
-    console.error('Erro ao buscar alertas:', error);
-    res.status(500)
-  }
-})
- */
-
+router.get('/notificacao24h', NotificacaoController.buscarNotificacaoDaEstacaoNasUltimas24Horas);
 
 export default router;

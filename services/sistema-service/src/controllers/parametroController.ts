@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../config";
 import { Parametro } from "../interfaces/parametro";
+import TimestampFormatado from "../middleware/timestampFormatado";
 
 const colecaoParametros = db.collection("Parametros");
 
@@ -10,19 +11,9 @@ export default class ParametroController {
   static async cadastrarParametro(req: Request, res: Response) {
     try {
       const dados: Parametro = req.body;
-      const novoParametro = await colecaoParametros.add(dados);
+      const novoParametro = await colecaoParametros.add(dados); // Adiciona um novo documento na coleção 'Parametros'
 
-      // Obter a data e hora atuais
-      const dataAtual = new Date();
-      const dia = String(dataAtual.getDate()).padStart(2, '0');
-      const mes = String(dataAtual.getMonth() + 1).padStart(2, '0'); // Mês começa do zero
-      const ano = dataAtual.getFullYear();
-      const horas = String(dataAtual.getHours()).padStart(2, '0');
-      const minutos = String(dataAtual.getMinutes()).padStart(2, '0');
-      const segundos = String(dataAtual.getSeconds()).padStart(2, '0');
-      
-      const timestampFormatado = `${dia}/${mes}/${ano} ${horas}:${minutos}:${segundos}`;
-
+      // Gravar novo parâmetro no Firestore
       await novoParametro.set({
         id: novoParametro.id,
         nome: dados.nome,
@@ -30,12 +21,11 @@ export default class ParametroController {
         fator: dados.fator,
         offset: dados.offset,
         descricao: dados.descricao,
-        criadoEm: timestampFormatado,
-        atualizadoEm: timestampFormatado,
+        criadoEm: TimestampFormatado(),
+        atualizadoEm: TimestampFormatado(),
       })
 
-      const { id, ...dadosSemId } = dados;
-      res.status(201).json({ id: novoParametro.id, ...dadosSemId });
+      res.status(201).json({ novoParametro });
     } catch (erro) {
         res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
     }
@@ -44,10 +34,12 @@ export default class ParametroController {
   // Função para buscar todos os parâmetros
   static async buscarParametros(req: Request, res: Response) {
     try {
-      const parametrosSnapshot = await colecaoParametros.get();
+      const parametrosSnapshot = await colecaoParametros.get(); // Busca todos os documentos da coleção 'Parametros'
+
+      // Mapear os dados dos parâmetros
       const parametros = parametrosSnapshot.docs.map(doc => ({
         id: doc.id, // ID gerado pelo Firestore
-        ...doc.data() as Omit<Parametro, 'id'>
+        ...doc.data() as Omit<Parametro, 'id'> // Dados do parâmetro
       }));
 
       res.status(200).json(parametros);
@@ -60,8 +52,8 @@ export default class ParametroController {
   static async buscarParametroPorId(req: Request, res: Response): Promise<void> {
     try {
       const parametroId = req.body;
-      const parametroRef = colecaoParametros.doc(parametroId.id);
-      const parametroEncontrado = await parametroRef.get();
+      const parametroRef = colecaoParametros.doc(parametroId.id); // Referência para o documento do parâmetro
+      const parametroEncontrado = await parametroRef.get(); // Busca o parâmetro no Firestore
 
       res.status(200).json(parametroEncontrado);
     } catch (error) {
@@ -73,23 +65,27 @@ export default class ParametroController {
   static async atualizarParametro(req: Request, res: Response) {
     try {
       const dadosAtualizados = req.body;
-      console.log("Dados recebidos para atualização:", dadosAtualizados);
-  
+
+      // Verificar se o ID do parâmetro está presente
       if (!dadosAtualizados.id) {
         res.status(400).json({ erro: "ID do parâmetro é obrigatório" });
         return;
       }
   
-      const parametroRef = colecaoParametros.doc(dadosAtualizados.id);
-      const parametroAtualizado = await parametroRef.get();
+      const parametroRef = colecaoParametros.doc(dadosAtualizados.id); // Referência para o documento do parâmetro
+      const parametroAtualizado = await parametroRef.get(); // Busca o parâmetro no Firestore
   
+      // Verificar se o parâmetro foi encontrado
       if (!parametroAtualizado.exists) {
         res.status(404).json({ erro: "Parâmetro não encontrado" });
         return;
       }
+
+      // Usar a função timestampFormatado para formatar a data atual
+      dadosAtualizados.atualizado = TimestampFormatado(); 
   
       await parametroRef.update(dadosAtualizados);
-      res.status(200).json({ id: dadosAtualizados.id, ...dadosAtualizados });
+      res.status(200).json({ dadosAtualizados });
     } catch (error) {
       console.error("Erro ao atualizar parâmetro:", error);
       res.status(500).json({ erro: "Falha ao editar parâmetro" });
@@ -100,7 +96,7 @@ export default class ParametroController {
   static async deletarParametro(req: Request, res: Response) {
     try {
       const parametroId = req.params.id;
-      await colecaoParametros.doc(parametroId).delete();
+      await colecaoParametros.doc(parametroId).delete(); // Deleta o parâmetro no Firestore
 
       res.status(200).json({ success: true, message: 'Parâmetro deletado com sucesso' });
     } catch (error) {
