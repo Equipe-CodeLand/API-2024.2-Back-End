@@ -1,6 +1,6 @@
 export enum TipoAlerta {
-    Perigo = 'perigo',
-    Atencao = 'atencao'
+    Perigo = 'Perigo',
+    Atencao = 'Atenção'
 }
 
 export enum Condicao {
