@@ -26,7 +26,7 @@ router.get('/parametros', ParametroController.buscarParametros)
 
 router.put('/parametro/atualizar/:id', ParametroController.atualizarParametro);
 
-router.delete('/parametro/:id', ParametroController.deletarParametro);
+router.delete('/parametro/deletar/:id', ParametroController.deletarParametro);
 
 
 // Rotas do CRUD de estação
