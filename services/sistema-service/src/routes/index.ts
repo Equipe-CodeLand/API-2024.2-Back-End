@@ -4,8 +4,13 @@ import ParametroController from "../controllers/parametroController";
 import EstacaoController from "../controllers/estacaoController";
 import AlertaController from "../controllers/alertaController";
 import NotificacaoController from "../controllers/notificacaoController";
+import LoginController from "../controllers/loginController";
+
 
 const router = Router();
+
+// Rota para o login de usuários
+router.post('/login', LoginController.login); // Adiciona a rota para login
 
 // Rotas do CRUD do usuário
 router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario); 
