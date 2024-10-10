@@ -34,6 +34,8 @@ router.post('/estacao/cadastro', EstacaoController.cadastrarEstacao);
 
 router.get('/estacoes', EstacaoController.buscarEstacoes);
 
+router.get('/estacao/:id', EstacaoController.buscarEstacaoPorId);
+
 router.put("/estacao/atualizar", EstacaoController.atualizarEstacao);
 
 router.delete('/estacao/deletar/:id', EstacaoController.deletarEstacao);
@@ -44,9 +46,9 @@ router.post('/alerta/cadastro', AlertaController.cadastrarAlerta);
 
 router.get('/alertas', AlertaController.obterAlertas);
 
-router.put("/alerta/atualizar", AlertaController.atualizarAlerta);
+router.put("/alerta/atualizar/:id", AlertaController.atualizarAlerta);
 
-router.delete('/alerta/deletar', AlertaController.deletarAlerta);
+router.delete('/alerta/deletar/:id', AlertaController.deletarAlerta);
 
 
 // Rotas do CRUD de notificação
