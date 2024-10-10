@@ -14,23 +14,23 @@ export default class AlertaController {
     // Função para cadastrar o alerta
     static async cadastrarAlerta(req: Request, res: Response) {
         const { estacaoId, parametroId, mensagemAlerta, tipoAlerta, condicao, valor } = req.body;
-    
+
         try {
             // Verifica se o id da estação e do parâmetro estão presentes
             if (!estacaoId || !parametroId) {
                 return res.status(400).json({ erro: "ID da estação e do parâmetro são obrigatórios." });
             }
-    
+
             // Buscar o fator atual do parâmetro
             const fator = await buscarValorParametro(parametroId);
             if (fator === null) {
                 return res.status(400).json({ erro: "Fator não encontrado." });
             }
-    
+
             // Criação uma nova referência de documento na coleção 'colecaoAlerta' no Firestore e pegando o id do alerta
             const novoAlertaRef = colecaoAlerta.doc();
             const novoAlertaId = novoAlertaRef.id;
-    
+
             // Cadastrar o alerta no Firestore
             await novoAlertaRef.set({
                 id: novoAlertaId,
@@ -43,16 +43,16 @@ export default class AlertaController {
                 criadoEm: TimestampFormatado(), // Formatação da data e hora atual (função no middleware)
                 atualizadoEm: TimestampFormatado(), // Formatação da data e hora atual (função no middleware)
             });
-    
+
             // Buscar o valor atual do parâmetro da estação
             const parametroAtual = await buscarValorParametro(parametroId);
             console.log(`Parâmetro atual: ${parametroAtual}`);
-    
+
             // Verificar se o parâmetro atual foi encontrado
             if (parametroAtual === null || parametroAtual === undefined) {
                 return res.status(400).json({ erro: "Parâmetro atual não encontrado." });
             }
-    
+
             // Verificar se o alerta é ativado
             const alertaAtivado = verificarCondicao(parametroAtual, valor, condicao);
             if (alertaAtivado) {
@@ -65,7 +65,7 @@ export default class AlertaController {
                         estacaoId
                     },
                 } as Request, res);
-    
+
                 // Verificar se a notificação foi cadastrada com sucesso
                 if (resultadoNotificacao?.status && typeof resultadoNotificacao.status === 'number') {
                     console.log("Notificação cadastrada com sucesso:", resultadoNotificacao);
@@ -75,7 +75,7 @@ export default class AlertaController {
                     }
                 }
             }
-    
+
             // Retornar o alerta cadastrado
             if (!res.headersSent) {
                 return res.status(201).json({
@@ -109,6 +109,7 @@ export default class AlertaController {
                 listaAlertas.push(alerta.data() as Alerta);
             });
 
+            console.log("lista de alertas:", listaAlertas)
             return res.status(200).json(listaAlertas); // Retornar a lista de alertas
         } catch (erro) {
             console.error("Erro ao buscar alertas:", erro);
@@ -138,51 +139,51 @@ export default class AlertaController {
     // Função para atualizar os alertas
     static async atualizarAlerta(req: Request, res: Response) {
         try {
-            const alertaId = req.body.id; // ID do alerta
+            const alertaId = req.params.id; // ID do alerta
             const alerta = req.body; // Alerta
-    
+
             // Buscar o alerta no banco de dados
             const alertaDoc = await colecaoAlerta.doc(alertaId).get();
-    
+
             // Verifica se o alerta foi encontrado
             if (!alertaDoc.exists) {
                 return res.status(404).json({ erro: "Alerta não encontrado" });
             }
-    
+
             // Verifica se o ID da estação está presente
-            const estacaoId = alerta.estacaoId;
+            const estacaoId = alerta.idEstacao;
             if (!estacaoId) {
                 return res.status(400).json({ erro: "ID da estação é obrigatório." });
             }
-    
+
             // Verifica se o ID do parâmetro está presente
-            const parametroId = alerta.parametroId;
+            const parametroId = alerta.idParametro;
             if (!parametroId) {
                 return res.status(400).json({ erro: "ID do parâmetro é obrigatório." });
             }
-    
+
             // Verifica se o tipo de alerta é válido
             if (!isValorEnum(TipoAlerta, alerta.tipoAlerta)) {
                 return res.status(400).json({ erro: "Tipo de alerta inválido." });
             }
-    
+
             // Verifica se a condição é válida
             if (!isValorEnum(Condicao, alerta.condicao)) {
                 return res.status(400).json({ erro: "Condição inválida." });
             }
-    
-            // Atualizar o alerta no banco de dados
-            await colecaoAlerta.doc(alertaId).update({
+
+            const alertaAtualizado = {
                 estacaoId: estacaoId,
                 parametroId: parametroId,
                 mensagemAlerta: alerta.mensagemAlerta,
                 tipoAlerta: alerta.tipoAlerta,
                 condicao: alerta.condicao,
                 valor: alerta.valor,
-                criadoEm: alerta.criadoEm,
                 atualizadoEm: TimestampFormatado(),
-            });
-    
+            };
+
+            await colecaoAlerta.doc(alertaId).update(alertaAtualizado);
+
             return res.status(200).json({ message: 'Alerta atualizado com sucesso' });
         } catch (erro) {
             console.error("Erro ao atualizar alerta:", erro);
@@ -193,7 +194,7 @@ export default class AlertaController {
     // Função para deletar por estação
     static async deletarAlerta(req: Request, res: Response) {
         try {
-            const alertaId = req.body.id; // ID do alerta
+            const alertaId = req.params.id; // ID do alerta
             await colecaoAlerta.doc(alertaId).delete(); // Deletar o alerta
 
             return res.status(200).json({ message: 'Alerta deletado com sucesso' });
