@@ -1,5 +1,5 @@
 export interface Parametro {
-    id?: number; 
+    id?: string; 
     nome: string;
     unidade: string;
     fator: number;
@@ -8,11 +8,3 @@ export interface Parametro {
     criadoEm?: string; 
     atualizadoEm?: string;
   }
-  
-// export interface Parametro{
-//     id: number,
-//     nome: string,
-//     fator: number,
-//     offset: number,
-//     descricao: string
-// }

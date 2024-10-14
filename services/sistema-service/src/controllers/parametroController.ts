@@ -1,165 +1,107 @@
-import { connectToDatabase } from "../config";
+import { Request, Response } from "express";
+import { db } from "../config";
 import { Parametro } from "../interfaces/parametro";
-import deleteMysql from "../middlewares/deleteMysql";
-import insertMysql from "../middlewares/insertMysql";
-import selectMysql from "../middlewares/selectMysql";
-import updateMysql from "../middlewares/updateMysql";
+import TimestampFormatado from "../middleware/timestampFormatado";
+
+const colecaoParametros = db.collection("Parametros");
 
 export default class ParametroController {
 
   // Função para cadastrar um novo parâmetro
-  static async cadastrarParametro(parametro: Parametro) {
-    const tabela = 'Parametro'; // Nome da tabela no banco de dados
-    const colunas = ['nome', 'unidade', 'fator', 'offset', 'descricao']; // Colunas que vão ser inseridas
-    const valores = [
-      parametro.nome,
-      parametro.unidade,
-      parametro.fator,
-      parametro.offset,
-      parametro.descricao
-    ];
-
+  static async cadastrarParametro(req: Request, res: Response) {
     try {
-      // INSERÇÃO de um novo parâmetro no banco de dados
-      const result = await insertMysql({ tabela, colunas, valores });
-      console.log('Parâmetro inserido com sucesso');
+      const dados: Parametro = req.body;
+      const novoParametro = await colecaoParametros.add(dados); // Adiciona um novo documento na coleção 'Parametros'
 
-      return {
-        success: true,
-        message: 'Parâmetro cadastrado com sucesso',
-        insertId: result
-      };
-    } catch (error) {
-      console.error('Erro ao cadastrar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao cadastrar parâmetro',
-        error
-      };
+      // Gravar novo parâmetro no Firestore
+      await novoParametro.set({
+        id: novoParametro.id,
+        nome: dados.nome,
+        unidade: dados.unidade,
+        fator: dados.fator,
+        offset: dados.offset,
+        descricao: dados.descricao,
+        criadoEm: TimestampFormatado(),
+        atualizadoEm: TimestampFormatado(),
+      })
+
+      res.status(201).json({ novoParametro });
+    } catch (erro) {
+        res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
     }
   }
 
   // Função para buscar todos os parâmetros
-  static async buscarParametros() {
+  static async buscarParametros(req: Request, res: Response) {
     try {
-      // Seleciona todos os parâmetros da tabela "Parametro"
-      const result = await selectMysql({ tabela: 'Parametro' });
-      // Verifica se o resultado existe e contém dados
-      if (Array.isArray(result) && result.length > 0) {
-        return {
-          success: true,
-          parametros: result,
-        };
-      } else {
-        return {
-          success: false,
-          message: 'Nenhum parâmetro encontrado',
-        };
-      }
+      const parametrosSnapshot = await colecaoParametros.get(); // Busca todos os documentos da coleção 'Parametros'
+
+      // Mapear os dados dos parâmetros
+      const parametros = parametrosSnapshot.docs.map(doc => ({
+        id: doc.id, // ID gerado pelo Firestore
+        ...doc.data() as Omit<Parametro, 'id'> // Dados do parâmetro
+      }));
+
+      res.status(200).json(parametros);
     } catch (error) {
-      console.error('Erro ao buscar parâmetros:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetros',
-        error,
-      };
-    }
-  }
-  static async buscarParametrosEstacao(idEstacao: number) {
-    try {
-      const result = await selectMysql({
-        select: 'select p.id, p.nome, p.unidade, p.fator, p.offset, p.descricao from ',
-        tabela: 'parametro p',
-        joins: ` INNER JOIN estacao_parametro ep ON p.id = ep.parametro_id INNER JOIN estacao e ON ep.estacao_id = e.id`,
-        where: `e.id = ${idEstacao}`
-      });
-      return result
-    } catch (error) {
-      console.error('Erro ao buscar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetro',
-        error
-      };
+      res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }
 
   // Função para buscar um parâmetro por ID
-  static async buscarParametroPorId(id: number) {
+  static async buscarParametroPorId(req: Request, res: Response): Promise<void> {
     try {
-      const result = await selectMysql({ tabela: 'Parametro', where: `id = ${id}` });
-      if (result.length > 0) {
-        return {
-          success: true,
-          parametro: result[0],
-        };
-      } else {
-        return {
-          success: false,
-          message: 'Parâmetro não encontrado',
-        };
-      }
+      const parametroId = req.body;
+      const parametroRef = colecaoParametros.doc(parametroId.id); // Referência para o documento do parâmetro
+      const parametroEncontrado = await parametroRef.get(); // Busca o parâmetro no Firestore
+
+      res.status(200).json(parametroEncontrado);
     } catch (error) {
-      console.error('Erro ao buscar parâmetro por ID:', error);
-      return {
-        success: false,
-        message: 'Erro ao buscar parâmetro por ID',
-        error,
-      };
+      res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }
 
   // Função para atualizar um parâmetro
-  static async atualizarParametro(id: number, parametro: Parametro) {
-    const tabela = 'Parametro';
-    const colunas = ['nome', 'unidade', 'fator', 'offset', 'descricao'];
-    const valores = [
-      parametro.nome,
-      parametro.unidade,
-      parametro.fator,
-      parametro.offset,
-      parametro.descricao
-    ];
-
+  static async atualizarParametro(req: Request, res: Response) {
     try {
+      const dadosAtualizados = req.body;
 
-      // ATUALIZAÇÃO de um parâmetro no banco de dados
-      const result = await updateMysql({ tabela, colunas, valores, where: `id = ${id}` });
-      console.log('Parâmetro atualizado com sucesso');
+      // Verificar se o ID do parâmetro está presente
+      if (!dadosAtualizados.id) {
+        res.status(400).json({ erro: "ID do parâmetro é obrigatório" });
+        return;
+      }
+  
+      const parametroRef = colecaoParametros.doc(dadosAtualizados.id); // Referência para o documento do parâmetro
+      const parametroAtualizado = await parametroRef.get(); // Busca o parâmetro no Firestore
+  
+      // Verificar se o parâmetro foi encontrado
+      if (!parametroAtualizado.exists) {
+        res.status(404).json({ erro: "Parâmetro não encontrado" });
+        return;
+      }
 
-      return {
-        success: true,
-        message: 'Parâmetro atualizado com sucesso',
-        updatedId: result
-      };
+      // Usar a função timestampFormatado para formatar a data atual
+      dadosAtualizados.atualizado = TimestampFormatado(); 
+  
+      await parametroRef.update(dadosAtualizados);
+      res.status(200).json({ dadosAtualizados });
     } catch (error) {
-      console.error('Erro ao atualizar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao atualizar parâmetro',
-        error
-      };
+      console.error("Erro ao atualizar parâmetro:", error);
+      res.status(500).json({ erro: "Falha ao editar parâmetro" });
     }
   }
 
   // Função para deletar um parâmetro
-  static async deletarParametro(id: number) {
+  static async deletarParametro(req: Request, res: Response) {
     try {
-      const result = await deleteMysql({ tabela: 'Parametro', where: `id = ${id}` });
-      console.log('Parâmetro deletado com sucesso');
+      const parametroId = req.params.id;
+      await colecaoParametros.doc(parametroId).delete(); // Deleta o parâmetro no Firestore
 
-      return {
-        success: true,
-        message: 'Parâmetro deletado com sucesso',
-        deletedId: result
-      };
+      res.status(200).json({ success: true, message: 'Parâmetro deletado com sucesso' });
     } catch (error) {
       console.error('Erro ao deletar parâmetro:', error);
-      return {
-        success: false,
-        message: 'Erro ao deletar parâmetro',
-        error
-      };
+      res.status(500).json({ erro: 'Falha ao deletar parâmetro' });
     }
   }
-}
+} 

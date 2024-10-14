@@ -1,7 +1,5 @@
-import { Parametro } from "./parametro"
-
-export interface Estacao{
-    id: number,
+export interface Estacao {
+    id: string,
     nome: string,
     uid: string,
     cep: string,
@@ -9,6 +7,9 @@ export interface Estacao{
     bairro: string,
     cidade: string,
     rua: string,
-    parametros: Parametro[]
-    status?: boolean
+    latitude: string,
+    longitude: string,
+    atualizadoEm: string,
+    criadoEm: string,
+    parametros: string[], 
 }
