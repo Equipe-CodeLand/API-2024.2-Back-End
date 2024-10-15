@@ -6,7 +6,7 @@ app = Flask(__name__)
 db_receptor = init_firebase_receptor() 
 db_client = init_firebase_client() 
 
-@app.route('/estacao/<string:uid>', methods=['GET'])
+@app.route('/parametrosEstacao/<string:uid>', methods=['GET'])
 def get_station_data(uid):
     try:
         # Buscar dados da estação
@@ -40,7 +40,7 @@ def get_station_data(uid):
         return jsonify({"error": str(e)}), 500
 
 def run_flask():
-    app.run(host='0.0.0.0', port=5000) 
+    app.run(host='0.0.0.0', port=5001) 
 
 if __name__ == "__main__":
     print("Iniciando servidor Flask...")
