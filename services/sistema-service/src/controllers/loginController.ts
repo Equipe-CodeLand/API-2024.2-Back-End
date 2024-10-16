@@ -12,12 +12,10 @@ export default class LoginController {
     try {
       const { email, senha } = req.body;
 
-      // Verifica se o email e senha foram fornecidos
       if (!email || !senha) {
         return res.status(400).json({ erro: "Email e senha são obrigatórios." });
       }
 
-      // Busca o usuário no Firestore com base no email
       const usuarioSnapshot = await colecaoUsuarios.where("email", "==", email).get();
 
       if (usuarioSnapshot.empty) {
@@ -27,15 +25,15 @@ export default class LoginController {
       const usuarioDoc = usuarioSnapshot.docs[0];
       const usuario = usuarioDoc.data() as Usuario;
 
-      // Verifica se a senha está correta
       if (usuario.senha !== senha) {
         return res.status(401).json({ erro: "Senha incorreta." });
       }
 
-      // Cria um token personalizado usando o Firebase Admin SDK
-      const customToken = await admin.auth().createCustomToken(usuarioDoc.id);
+      // Incluir o perfil do usuário no token gerado
+      const customToken = await admin.auth().createCustomToken(usuarioDoc.id, {
+        perfil: usuario.perfil  // Inclui o perfil no token
+      });
 
-      // Retorna o token gerado para o frontend
       res.status(200).json({
         message: "Login bem-sucedido.",
         token: customToken,
@@ -44,21 +42,6 @@ export default class LoginController {
     } catch (erro) {
       console.error("Erro no login:", erro);
       res.status(500).json({ erro: "Falha no login. Tente novamente." });
-    }
-  }
-
-  // Função para verificar o token de autenticação (opcional, caso queira rotas protegidas)
-  static async verificarToken(req: Request, res: Response) {
-    const { token } = req.body;
-
-    try {
-      // Verifica se o token é válido
-      const decodedToken = await admin.auth().verifyIdToken(token);
-      const uid = decodedToken.uid;
-
-      res.status(200).json({ message: "Token válido.", uid });
-    } catch (erro) {
-      res.status(401).json({ erro: "Token inválido." });
     }
   }
 }

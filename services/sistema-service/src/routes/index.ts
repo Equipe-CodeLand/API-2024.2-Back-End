@@ -5,7 +5,7 @@ import EstacaoController from "../controllers/estacaoController";
 import AlertaController from "../controllers/alertaController";
 import NotificacaoController from "../controllers/notificacaoController";
 import LoginController from "../controllers/loginController";
-
+import { verificarAdmin } from "../middleware/verificarAdmin";
 
 const router = Router();
 
@@ -13,7 +13,7 @@ const router = Router();
 router.post('/login', LoginController.login); // Adiciona a rota para login
 
 // Rotas do CRUD do usuário
-router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario); 
+router.post('/usuario/cadastro', verificarAdmin, UsuarioController.cadastrarUsuario); 
 
 router.get('/usuarios', UsuarioController.buscarUsuarios);
 
@@ -27,7 +27,7 @@ router.delete("/usuario/deletar", UsuarioController.deletarUsuario);
 // Rotas do CRUD de parâmetros
 router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
-router.get('/parametros', ParametroController.buscarParametros)
+router.get('/parametros',  ParametroController.buscarParametros);
 
 router.put('/parametro/atualizar/:id', ParametroController.atualizarParametro);
 
@@ -39,7 +39,7 @@ router.post('/estacao/cadastro', EstacaoController.cadastrarEstacao);
 
 router.get('/estacoes', EstacaoController.buscarEstacoes);
 
-router.get('/estacao/:id', EstacaoController.buscarEstacaoPorId);
+router.get('/estacao/:id',  EstacaoController.buscarEstacaoPorId);
 
 router.put("/estacao/atualizar", EstacaoController.atualizarEstacao);
 
