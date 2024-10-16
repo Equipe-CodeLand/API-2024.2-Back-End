@@ -65,12 +65,12 @@ def check_and_print_station_parameters(uid):
         print(f"Erro ao verificar no Firebase (secundário): {e}")
 
 # Função chamada quando o cliente se conecta ao broker MQTT
-def on_connect(con, rc):
+def on_connect(con, userData, flag, rc):
     print("Conectado ao MQTT Broker com código de resultado: " + str(rc))
     con.subscribe("fatec/api/4dsm/codeLand/")
 
 # Callback para quando uma mensagem é recebida via MQTT
-def on_message(msg):
+def on_message(con, userData, msg):
     print(f"Mensagem recebida do tópico {msg.topic}: {str(msg.payload)}")
     try:
         # Decodifica a mensagem e converte para dicionário
