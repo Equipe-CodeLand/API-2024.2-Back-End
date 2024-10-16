@@ -1,7 +1,9 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from config.firebase_config import init_firebase_receptor, init_firebase_client
 
 app = Flask(__name__)
+CORS(app)
 
 db_receptor = init_firebase_receptor() 
 db_client = init_firebase_client() 
@@ -17,7 +19,8 @@ def get_station_data(uid):
             data = doc.to_dict()
             filtered_data = {
                 "nome": data.get("nome", "N/A"),
-                "uid": data.get("uid", "N/A")
+                "uid": data.get("uid", "N/A"),
+                "id": data.get("id", "N/A")
             }
             station_data.append(filtered_data)
 
