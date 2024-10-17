@@ -3,22 +3,16 @@ import admin from "firebase-admin";
 
 // Middleware para verificar se o usuário é Administrador
 export const verificarAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    // Obtém o cabeçalho de autorização
-    const authHeader = req.headers['authorization'];
-    
-    // Verifica se o cabeçalho está presente
-    if (!authHeader) {
-      return res.status(403).json({ erro: "Token não fornecido." });
-    }
+  const authorization = req.headers.authorization;
 
-    // O token deve estar no formato "Bearer <token>"
-    const token = authHeader.split(' ')[1];
-    
-    // Verifica se o token foi fornecido
-    if (!token) {
-      return res.status(403).json({ erro: "Token não fornecido." });
-    }
+  // Verifica se o cabeçalho de autorização foi fornecido
+  if (!authorization || !authorization.startsWith("Bearer ")) {
+    return res.status(403).json({ erro: "Token não fornecido ou malformado." });
+  }
+
+  try {
+    // Extração do token do cabeçalho de autorização
+    const token = authorization.split(" ")[1];
 
     // Verifica o token e decodifica o payload
     const decodedToken = await admin.auth().verifyIdToken(token);
@@ -32,6 +26,6 @@ export const verificarAdmin = async (req: Request, res: Response, next: NextFunc
     next();
   } catch (erro) {
     console.error("Erro ao verificar o token:", erro);
-    res.status(401).json({ erro: "Token inválido." });
+    res.status(401).json({ erro: "Token inválido ou erro na verificação do token." });
   }
 };
