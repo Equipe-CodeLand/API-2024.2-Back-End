@@ -12,9 +12,11 @@ declare global {
 
 // Middleware para verificar se o usuário é Administrador
 export const verificarAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Token Bearer
+  // Extrai o token da autorização Bearer
+  const token = req.headers.authorization?.split(" ")[1];
   console.log("Token recebido:", token);
 
+  // Verifica se o token foi fornecido
   if (!token) {
     return res.status(401).json({ erro: "Token não fornecido." });
   }
@@ -33,8 +35,12 @@ export const verificarAdmin = async (req: Request, res: Response, next: NextFunc
       return res.status(403).json({ erro: "Acesso negado. Usuário não é administrador." });
     }
 
-    req.user = decodedToken; // Adiciona as informações do usuário à requisição
-    next(); // Continua para a próxima função no middleware
+    // Adiciona as informações do usuário à requisição
+    req.user = decodedToken;
+
+    // Continua para a próxima função no middleware
+    next();
+
   } catch (erro) {
     console.error("Erro ao verificar o token:", erro);
     return res.status(403).json({ erro: "Token inválido ou expirado." });
