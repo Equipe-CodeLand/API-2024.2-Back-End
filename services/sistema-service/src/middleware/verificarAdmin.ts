@@ -1,31 +1,42 @@
 import { Request, Response, NextFunction } from "express";
 import admin from "firebase-admin";
+import { getIdToken } from "../config";
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: admin.auth.DecodedIdToken;
+    }
+  }
+}
 
 // Middleware para verificar se o usuário é Administrador
 export const verificarAdmin = async (req: Request, res: Response, next: NextFunction) => {
-  const authorization = req.headers.authorization;
+  const token = req.headers.authorization?.split(" ")[1]; // Token Bearer
+  console.log("Token recebido:", token);
 
-  // Verifica se o cabeçalho de autorização foi fornecido
-  if (!authorization || !authorization.startsWith("Bearer ")) {
-    return res.status(403).json({ erro: "Token não fornecido ou malformado." });
+  if (!token) {
+    return res.status(401).json({ erro: "Token não fornecido." });
   }
 
   try {
-    // Extração do token do cabeçalho de autorização
-    const token = authorization.split(" ")[1];
+    // Troca o custom token por um ID token
+    const idToken = await getIdToken(token);
+    console.log("ID Token obtido:", idToken);
 
-    // Verifica o token e decodifica o payload
-    const decodedToken = await admin.auth().verifyIdToken(token);
+    // Verifica o ID token usando o Firebase Admin
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    console.log("Token decodificado:", decodedToken);
 
-    // Verifica se o perfil do usuário é Administrador
+    // Verifica se o perfil do usuário é "Administrador"
     if (decodedToken.perfil !== "Administrador") {
-      return res.status(403).json({ erro: "Acesso negado. Apenas administradores podem realizar esta ação." });
+      return res.status(403).json({ erro: "Acesso negado. Usuário não é administrador." });
     }
 
-    // Continua para a rota se o perfil for Administrador
-    next();
+    req.user = decodedToken; // Adiciona as informações do usuário à requisição
+    next(); // Continua para a próxima função no middleware
   } catch (erro) {
     console.error("Erro ao verificar o token:", erro);
-    res.status(401).json({ erro: "Token inválido ou erro na verificação do token." });
+    return res.status(403).json({ erro: "Token inválido ou expirado." });
   }
 };

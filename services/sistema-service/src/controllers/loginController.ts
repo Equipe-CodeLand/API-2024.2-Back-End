@@ -16,6 +16,7 @@ export default class LoginController {
         return res.status(400).json({ erro: "Email e senha são obrigatórios." });
       }
 
+      // Buscar o usuário no Firestore
       const usuarioSnapshot = await colecaoUsuarios.where("email", "==", email).get();
 
       if (usuarioSnapshot.empty) {
@@ -25,20 +26,24 @@ export default class LoginController {
       const usuarioDoc = usuarioSnapshot.docs[0];
       const usuario = usuarioDoc.data() as Usuario;
 
+      // Verificar a senha
       if (usuario.senha !== senha) {
         return res.status(401).json({ erro: "Senha incorreta." });
       }
 
-      // Incluir o perfil do usuário no token gerado
+      // Gerar o token JWT customizado usando o Firebase Authentication
       const customToken = await admin.auth().createCustomToken(usuarioDoc.id, {
-        perfil: usuario.perfil  // Inclui o perfil no token
+        perfil: usuario.perfil // Envia o perfil como parte das claims
       });
 
+      // Enviar o token na resposta
       res.status(200).json({
         message: "Login bem-sucedido.",
-        token: customToken,
-        usuarioId: usuarioDoc.id
+        token: customToken, // Token JWT customizado
+        usuarioId: usuarioDoc.id,
+        perfil: usuario.perfil // Inclui informações do perfil
       });
+      
     } catch (erro) {
       console.error("Erro no login:", erro);
       res.status(500).json({ erro: "Falha no login. Tente novamente." });
