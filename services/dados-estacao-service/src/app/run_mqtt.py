@@ -107,7 +107,6 @@ def publish_data(con):
         print(f"Publicado: {msg}")
         time.sleep(15)
 
-
 if __name__ == "__main__":
     # Inicializando o cliente MQTT
     con = mqtt.Client()
