@@ -128,5 +128,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-venv
+
+#json de conexão
+/services/dados-estacao-service/src/app/config-client.json
+/services/dados-estacao-service/src/app/config-service.json
 
