@@ -39,7 +39,7 @@ router.post('/estacao/cadastro', verificarAdmin, EstacaoController.cadastrarEsta
 
 router.get('/estacoes', EstacaoController.buscarEstacoes);
 
-router.get('/estacao/:id', verificarAdmin,  EstacaoController.buscarEstacaoPorId);
+router.get('/estacao/:id', EstacaoController.buscarEstacaoPorId);
 
 router.put("/estacao/atualizar", verificarAdmin, EstacaoController.atualizarEstacao);
 
