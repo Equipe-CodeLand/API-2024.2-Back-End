@@ -13,7 +13,7 @@ const router = Router();
 router.post('/login', LoginController.login); // Adiciona a rota para login
 
 // Rotas do CRUD do usuário
-router.post('/usuario/cadastro', verificarAdmin, UsuarioController.cadastrarUsuario); 
+router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario); 
 
 router.get('/usuarios', verificarAdmin, UsuarioController.buscarUsuarios);
 
