@@ -21,6 +21,7 @@ export default class ParametroController {
         fator: dados.fator,
         offset: dados.offset,
         descricao: dados.descricao,
+        sigla: dados.sigla,
         criadoEm: TimestampFormatado(),
         atualizadoEm: TimestampFormatado(),
       })
@@ -104,4 +105,4 @@ export default class ParametroController {
       res.status(500).json({ erro: 'Falha ao deletar parâmetro' });
     }
   }
-} 
+}
