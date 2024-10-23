@@ -4,7 +4,7 @@ from firebase_admin import credentials, firestore
 # Conexão com o banco Receptor dos dados
 def init_firebase_receptor():
     try:
-        cred = credentials.Certificate("<SEU_CONFIG>")# Caminho para o arquivo JSON de credenciais do banco intermediario (api-tecsus-service)
+        cred = credentials.Certificate("<SEU_CONFI>")# Caminho para o arquivo JSON de credenciais do banco intermediario (api-tecsus-service)
         firebase_admin.initialize_app(cred)
         db_receptor = firestore.client()
         print("Conexão com Firebase Receptor estabelecida com sucesso.")
