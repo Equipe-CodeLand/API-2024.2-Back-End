@@ -16,7 +16,6 @@ payload = {
     "tem": 24,
     "vel": 38
 }
-
 # Função para enviar dados ao Firebase Firestore
 def send_to_firebase(data):
     try:
