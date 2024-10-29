@@ -9,7 +9,7 @@ db_receptor = init_firebase_receptor()
 db_client = init_firebase_client()      
 
 payload = {
-    "uid": "user123",
+    "uid": "fa:c3:53:b9:a7:02",
     "uxt": int(time.time()), 
     "plu": 24,
     "umi": 80,
