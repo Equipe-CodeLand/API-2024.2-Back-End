@@ -1,21 +1,12 @@
 import paho.mqtt.client as mqtt
 import time
 import json
-import random
 from config.firebase_config import init_firebase_receptor, init_firebase_client
 
 # Inicializando Firebase Firestore
-db_receptor = init_firebase_receptor()  
-db_client = init_firebase_client()      
+db_receptor = init_firebase_receptor()
+db_client = init_firebase_client()
 
-payload = {
-    "uid": "fa:c3:53:b9:a7:02",
-    "uxt": int(time.time()), 
-    "plu": 24,
-    "umi": 80,
-    "tem": 24,
-    "vel": 38
-}
 # Função para enviar dados ao Firebase Firestore
 def send_to_firebase(data):
     try:
@@ -34,14 +25,14 @@ def check_and_print_station_parameters(uid):
         encontrados = False
         for doc in docs:
             data = doc.to_dict()
-            nome_estacao = data.get('nome', 'N/A')  
+            nome_estacao = data.get('nome', 'N/A')
             uid_estacao = data.get('uid', 'N/A')
             print(f"Estação Encontrada:")
             print(f" - Nome da Estação: {nome_estacao}")
             print(f" - UID da Estação: {uid_estacao}")
             print(f" - UID do Receptor: {uid}")
 
-            # buscar os parâmetros relacionados na coleção 'Receptor'
+            # Buscar os parâmetros relacionados na coleção 'Receptor'
             parametros = db_receptor.collection('Receptor').where('uid', '==', uid).stream()
             param_list = []
             for param_doc in parametros:
@@ -57,7 +48,7 @@ def check_and_print_station_parameters(uid):
                 print(" - Nenhum parâmetro encontrado para esta estação.")
 
             encontrados = True
-        
+
         if not encontrados:
             print(f"Nenhuma estação encontrada com UID: {uid}")
     except Exception as e:
@@ -89,23 +80,6 @@ def on_message(con, userData, msg):
     except Exception as e:
         print(f"Erro geral no processamento da mensagem: {e}")
 
-
-
-#----------------------PUBLISHER----------------------------------   
-
-# Função para publicar mensagens MQTT simuladas
-def publish_data(con):
-    while True:
-        payload["plu"] += 1
-        payload["uxt"] = int(time.time())
-        payload["umi"] = random.randint(60, 98)
-        payload["tem"] = random.randint(24, 39)
-        payload["vel"] = random.randint(0, 50)  
-        msg = json.dumps(payload)
-        con.publish("fatec/api/4dsm/codeLand/", msg)
-        print(f"Publicado: {msg}")
-        time.sleep(15)
-
 if __name__ == "__main__":
     # Inicializando o cliente MQTT
     con = mqtt.Client()
@@ -118,10 +92,7 @@ if __name__ == "__main__":
     con.connect("test.mosquitto.org", 1883, 15)
     con.loop_start()
 
-    # Publicando dados MQTT
-    print("Publicando dados simulados para MQTT...")
-
-    # Aguarda a conexão antes de iniciar a publicação contínua
-    time.sleep(2)
-
-    publish_data(con)
+    # Mantém o script rodando para receber mensagens MQTT
+    print("Aguardando mensagens do MQTT...")
+    while True:
+        time.sleep(1)
