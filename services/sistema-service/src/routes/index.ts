@@ -15,9 +15,9 @@ router.post('/login', LoginController.login); // Adiciona a rota para login
 // Rotas do CRUD do usuário
 router.post('/usuario/cadastro', UsuarioController.cadastrarUsuario); 
 
-router.get('/usuarios', verificarAdmin, UsuarioController.buscarUsuarios);
+router.get('/usuarios', UsuarioController.buscarUsuarios);
 
-router.get('/usuario/:id', verificarAdmin, UsuarioController.buscarUsuarioPorId);
+router.get('/usuario/:id', UsuarioController.buscarUsuarioPorId);
 
 router.put("/usuario/atualizar", verificarAdmin, UsuarioController.atualizarUsuario);
 
