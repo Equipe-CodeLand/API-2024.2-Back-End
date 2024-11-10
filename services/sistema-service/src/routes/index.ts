@@ -63,4 +63,7 @@ router.get('/notificacao/estacao', NotificacaoController.buscarNotificacaoPorEst
 
 router.get('/notificacao24h', NotificacaoController.buscarNotificacaoDaEstacaoNasUltimas24Horas);
 
+// Rotas de backup
+
+
 export default router;
