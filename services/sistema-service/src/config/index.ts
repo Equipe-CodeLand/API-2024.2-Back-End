@@ -2,34 +2,73 @@ import admin from "firebase-admin";
 import dotenv from "dotenv";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
+import { backupFirestore } from "../controllers/backupController";
+import { Storage } from "@google-cloud/storage";
 
 dotenv.config();
 
-// Inicializa o Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-  }),
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
+const isLocal = process.env.FIREBASE_LOCAL === 'true';
+
+if (!admin.apps.length) {
+  if (isLocal) {
+    admin.initializeApp({
+      credential: admin.credential.applicationDefault(),
+      projectId: process.env.FIREBASE_PROJECT_ID,
+    });
+    const firestore = admin.firestore();
+    firestore.settings({
+      host: 'localhost:8080', // Conectar ao emulador
+      ssl: false, // Desabilitar SSL para a conexão local
+    });
+    console.log("Conectado ao Firestore local");
+  } else {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      }),
+      databaseURL: process.env.FIREBASE_DATABASE_URL,
+    });
+    console.log("Conectado ao Firestore de produção");
+  }
+}
+
+const db = admin.firestore();
 
 // Configurações do Firebase Client SDK
 const firebaseConfig = {
-  apiKey: "AIzaSyBiQlW32muvBhZd-p_qxkcPEDgUEub8wfY",
-  authDomain: "api-tecsus-fb8bd.firebaseapp.com",
-  databaseURL: "https://api-tecsus-fb8bd-default-rtdb.firebaseio.com",
-  projectId: "api-tecsus-fb8bd",
-  storageBucket: "api-tecsus-fb8bd.appspot.com",
-  messagingSenderId: "69413262372",
-  appId: "1:69413262372:web:66c7925bea38d2defdb4b1"
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
 };
+
+// Inicialização do Google Cloud Storage
+const storage = new Storage({
+  projectId: process.env.GCLOUD_PROJECT_ID,
+  credentials: {
+    client_email: process.env.GCLOUD_CLIENT_EMAIL,
+    private_key: process.env.GCLOUD_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  },
+});
 
 // Inicializa o Firebase Client SDK
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
+
+// Função principal para fazer backup do Firestore
+// (async () => {
+//   try {
+//     await backupFirestore();
+//   } catch (error) {
+//     console.error('Erro ao fazer backup do Firestore:', error);
+//   }
+// })();
 
 // Função para obter o ID token de um usuário autenticado
 async function getIdToken(customToken: string): Promise<string> {
@@ -41,5 +80,4 @@ async function getIdToken(customToken: string): Promise<string> {
   throw new Error("Não foi possível obter o ID token.");
 }
 
-const db = admin.firestore();
-export { db, getIdToken };
+export { db, getIdToken, storage };
