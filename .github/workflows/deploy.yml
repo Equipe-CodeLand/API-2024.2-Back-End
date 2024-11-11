@@ -1,4 +1,4 @@
-name: CI/CD - Back-end
+name: Deploy - Back-end
 
 on:
   push:
