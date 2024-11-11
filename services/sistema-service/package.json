@@ -23,6 +23,8 @@
     "mysql2": "^3.11.2",
     "reflect-metadata": "^0.2.2",
     "sistema-service": "file:",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "swagger-ui-react": "^5.17.14"
   },
   "devDependencies": {
