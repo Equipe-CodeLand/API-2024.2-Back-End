@@ -18,12 +18,12 @@ jobs:
 
       - name: Build e Push da Imagem Docker do serviço do sistema
         run: |
-          docker build -t velipefieira/sistema:latest -f Dockerfile .
+          docker build -t velipefieira/sistema:latest -f services/sistema-service/Dockerfile backend/services/sistema-service
           docker push velipefieira/sistema:latest
 
       - name: Build e Push da Imagem Docker do serviço para recepção de dados
         run: |
-          docker build -t velipefieira/recepcao:latest -f Dockerfile .
+          docker build -t velipefieira/recepcao:latest -f services/dados-estacao-service/Dockerfile backend/services/dados-estacao-service
           docker push velipefieira/recepcao:latest
 
   deploy_sistema:
