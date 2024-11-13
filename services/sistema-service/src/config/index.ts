@@ -20,6 +20,7 @@ if (!admin.apps.length) {
       host: 'localhost:8080', // Conectar ao emulador
       ssl: false, // Desabilitar SSL para a conexão local
     });
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099'; 
     console.log("Conectado ao Firestore local");
   } else {
     admin.initializeApp({
