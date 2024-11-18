@@ -73,12 +73,25 @@ if (!firebase.apps.length) {
 
 // Função para obter o ID token de um usuário autenticado
 async function getIdToken(customToken: string): Promise<string> {
-  await firebase.auth().signInWithCustomToken(customToken);
-  const user = firebase.auth().currentUser;
-  if (user) {
-    return user.getIdToken();
+  if (isLocal) {
+    // Usar emulador de autenticação para obter o token no modo local
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
+    firebase.auth().useEmulator('http://localhost:9099/');
+    await firebase.auth().signInWithCustomToken(customToken);
+    const user = firebase.auth().currentUser;
+    if (user) {
+      return user.getIdToken();
+    }
+    throw new Error("Não foi possível obter o ID token.");
+  } else {
+    await firebase.auth().signInWithCustomToken(customToken);
+    const user = firebase.auth().currentUser;
+    if (user) {
+      return user.getIdToken();
+    }
+    throw new Error("Não foi possível obter o ID token.");
   }
-  throw new Error("Não foi possível obter o ID token.");
 }
+
 
 export { db, getIdToken, storage };

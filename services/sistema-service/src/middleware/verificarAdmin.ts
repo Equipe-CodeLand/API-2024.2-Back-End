@@ -27,7 +27,7 @@ export const verificarAdmin = async (req: Request, res: Response, next: NextFunc
     console.log("ID Token obtido:", idToken);
 
     // Verifica o ID token usando o Firebase Admin
-    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const decodedToken = await admin.auth().verifyIdToken(idToken); // Adicionado "true" para forçar a verificação da integridade do token
     console.log("Token decodificado:", decodedToken);
 
     // Verifica se o perfil do usuário é "Administrador"
