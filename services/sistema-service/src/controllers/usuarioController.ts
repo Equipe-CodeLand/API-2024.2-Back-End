@@ -34,6 +34,7 @@ export default class UsuarioController {
 
       res.status(201).json({ novoUsuario }); // Retorna o novo usuário cadastrado
     } catch (erro) {
+        console.error("Erro ao cadastrar usuário:", erro);
         res.status(500).json({ erro: "Falha ao cadastrar usuário" });
     }
   }
@@ -49,6 +50,7 @@ export default class UsuarioController {
 
     res.status(200).json(usuarios);
     } catch (error) {
+      console.error("Erro ao listar usuários:", error);
       res.status(500).json({ erro: "Falha ao listar usuários" });
     }
   }  
@@ -69,6 +71,7 @@ export default class UsuarioController {
       const dados = usuarioEncontrado.data(); // Dados do usuário
       res.status(200).json({ dados });
     } catch (error) {
+      console.error("Erro ao buscar usuário por ID:", error);
       res.status(500).json({ erro: "Falha ao buscar usuário" });
     }
   }
@@ -112,6 +115,7 @@ export default class UsuarioController {
 
       res.status(204).end();
     } catch (erro) {
+        console.error("Erro ao excluir usuário:", erro);
         res.status(500).json({ erro: "Falha ao excluir usuário" });
     }
   } 

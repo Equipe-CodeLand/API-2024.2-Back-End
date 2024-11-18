@@ -2,11 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import admin from "firebase-admin";
 import { getIdToken } from "../config";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: admin.auth.DecodedIdToken;
-    }
+declare module "express-serve-static-core" {
+  interface Request {
+    user?: admin.auth.DecodedIdToken;
   }
 }
 

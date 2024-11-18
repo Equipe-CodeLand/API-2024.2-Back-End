@@ -30,7 +30,7 @@ export default class EstacaoController {
             });
 
             // Executa todas as promessas para buscar os parâmetros
-            const parametrosEncontrados = await Promise.all(parametrosPromises);
+            await Promise.all(parametrosPromises);
 
             // Criar referência para a nova estação
             const novaEstacaoRef = colecaoEstacao.doc();
@@ -54,9 +54,9 @@ export default class EstacaoController {
             });
 
             // Retornar a resposta com o ID da nova estação e os dados da estação
-            const { id, ...dadosSemId } = dados;
+            const { ...dadosSemId } = dados;
             console.log("cadastro feito com sucesso")
-            return res.status(201).json({ id: novaEstacaoId, ...dadosSemId, parametros, criadoEm: TimestampFormatado(), atualizadoEm: TimestampFormatado() });
+            return res.status(201).json({ ...dadosSemId, id: novaEstacaoId, parametros, criadoEm: TimestampFormatado(), atualizadoEm: TimestampFormatado() });
         } catch (error) {
             console.error("Erro ao cadastrar estação:", error);
             return res.status(500).json({ erro: "Falha ao cadastrar estação." });
@@ -74,6 +74,7 @@ export default class EstacaoController {
 
             res.status(200).json(estacoes);
         } catch (error) {
+            console.error("Erro ao buscar estações:", error);
             res.status(500).json({ erro: "Falha ao buscar estações" });
         }
     }
@@ -124,8 +125,8 @@ export default class EstacaoController {
 
             await estacaoRef.update(dadosAtualizados); // Atualizar a estação
             res.status(200).json({ mensagem: "Estação atualizada com sucesso!", id: dadosAtualizados.id });
-        } catch (erro) {
-            console.error("Erro ao atualizar estação:", erro); // Log completo do erro
+        } catch (error) {
+            console.error("Erro ao atualizar estação:", error); // Log completo do erro
             res.status(500).json({ erro: "Falha ao editar estação" });
         }
     }
@@ -137,9 +138,9 @@ export default class EstacaoController {
             await colecaoEstacao.doc(id).delete();
 
             res.status(204).end();
-        } catch (erro) {
+        } catch (error) {
+            console.error("Erro ao excluir estação:", error);
             res.status(500).json({ erro: "Falha ao excluir estação" });
-            console.log("Falha ao excluir estação");
         }
     }
 }

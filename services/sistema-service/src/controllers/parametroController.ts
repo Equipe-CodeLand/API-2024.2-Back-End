@@ -28,7 +28,8 @@ export default class ParametroController {
 
       res.status(201).json({ novoParametro });
     } catch (erro) {
-        res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
+      console.error("Erro ao cadastrar parâmetro:", erro);
+      res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
     }
   }
 
@@ -45,6 +46,7 @@ export default class ParametroController {
 
       res.status(200).json(parametros);
     } catch (error) {
+      console.error("Erro ao listar parâmetros:", error);
       res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }
@@ -58,6 +60,7 @@ export default class ParametroController {
 
       res.status(200).json(parametroEncontrado);
     } catch (error) {
+      console.error("Erro ao listar parâmetro por ID:", error);
       res.status(500).json({ erro: "Falha ao listar parâmetros" });
     }
   }

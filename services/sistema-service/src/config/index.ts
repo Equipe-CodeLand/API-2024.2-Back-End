@@ -2,7 +2,6 @@ import admin from "firebase-admin";
 import dotenv from "dotenv";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import { backupFirestore } from "../controllers/backupController";
 import { Storage } from "@google-cloud/storage";
 
 dotenv.config();
@@ -60,15 +59,6 @@ const storage = new Storage({
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-
-// Função principal para fazer backup do Firestore
-// (async () => {
-//   try {
-//     await backupFirestore();
-//   } catch (error) {
-//     console.error('Erro ao fazer backup do Firestore:', error);
-//   }
-// })();
 
 // Função para obter o ID token de um usuário autenticado
 async function getIdToken(customToken: string): Promise<string> {

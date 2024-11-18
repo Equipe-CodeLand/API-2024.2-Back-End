@@ -48,6 +48,7 @@ export default class NotificacaoController {
 
             return res.status(201).json({ mensagem: "Notificação cadastrada com sucesso" });
         } catch (erro) {
+            console.error("Erro ao cadastrar notificação:", erro);
             res.status(404).json({ erro: "Não foi cadastrar a notificação " })
         }
     }

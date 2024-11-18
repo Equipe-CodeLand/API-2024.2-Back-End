@@ -11,6 +11,7 @@ backupRouter.get('/listar-backups', async (req, res) => {
     const backups = await listBackups();
     res.status(200).json(backups);
   } catch (error) {
+    console.error("Erro ao listar backups:", error);
     res.status(500).json({ erro: "Falha ao listar backups" });
   }
 });
@@ -33,6 +34,7 @@ backupRouter.post('/baixar-backups', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error("Erro ao baixar o backup:", error);
     res.status(500).json({ erro: 'Erro ao baixar o backup' });
   }
 });
@@ -68,7 +70,6 @@ backupRouter.post('/restore-backups', async (req, res) => {
       // Caso o erro não seja do tipo Error, retornar uma mensagem genérica
       return res.status(500).json({ message: 'Erro desconhecido ao restaurar backup' });
     }
-
   }
 });
 
