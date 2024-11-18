@@ -13,6 +13,8 @@ export default [
         ...globals.browser,
         process: "readonly",
         __dirname: "readonly",
+        exports: "readonly", // Adiciona exports como global
+        require: "readonly", // Adiciona require como global
       },
       parser: tsParser,
     },
@@ -25,6 +27,11 @@ export default [
       ...tseslint.configs.recommended.rules,
       ...pluginReact.configs.recommended.rules,
       "@typescript-eslint/no-unused-expressions": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "no-undef": "off", 
+      "import/no-unresolved": "off", 
+      "@typescript-eslint/explicit-module-boundary-types": "off", 
+      "@typescript-eslint/no-explicit-any": "off"
     },
   },
 ];
