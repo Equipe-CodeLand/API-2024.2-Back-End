@@ -48,6 +48,13 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID,
 };
 
+// Inicializa o Firebase Client SDK
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+   if (isLocal) {
+    firebase.auth().useEmulator('http://localhost:9099/');
+  }
+}
 // Inicialização do Google Cloud Storage
 const storage = new Storage({
   projectId: process.env.GCLOUD_PROJECT_ID,
@@ -57,10 +64,6 @@ const storage = new Storage({
   },
 });
 
-// Inicializa o Firebase Client SDK
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
 
 // Função principal para fazer backup do Firestore
 // (async () => {
@@ -73,24 +76,12 @@ if (!firebase.apps.length) {
 
 // Função para obter o ID token de um usuário autenticado
 async function getIdToken(customToken: string): Promise<string> {
-  if (isLocal) {
-    // Usar emulador de autenticação para obter o token no modo local
-    process.env.FIREBASE_AUTH_EMULATOR_HOST = 'localhost:9099';
-    firebase.auth().useEmulator('http://localhost:9099/');
-    await firebase.auth().signInWithCustomToken(customToken);
-    const user = firebase.auth().currentUser;
-    if (user) {
-      return user.getIdToken();
-    }
-    throw new Error("Não foi possível obter o ID token.");
-  } else {
-    await firebase.auth().signInWithCustomToken(customToken);
-    const user = firebase.auth().currentUser;
-    if (user) {
-      return user.getIdToken();
-    }
-    throw new Error("Não foi possível obter o ID token.");
+  await firebase.auth().signInWithCustomToken(customToken);
+  const user = firebase.auth().currentUser;
+  if (user) {
+    return user.getIdToken();
   }
+  throw new Error("Não foi possível obter o ID token.");
 }
 
 

@@ -27,10 +27,10 @@ export const verificarAdmin = async (req: Request, res: Response, next: NextFunc
     console.log("ID Token obtido:", idToken);
 
     // Verifica o ID token usando o Firebase Admin
-    const decodedToken = await admin.auth().verifyIdToken(idToken); // Adicionado "true" para forçar a verificação da integridade do token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
     console.log("Token decodificado:", decodedToken);
 
-    // Verifica se o perfil do usuário é "Administrador"
+    // Verifica se o perfil do usuário é "Administrador
     if (decodedToken.perfil !== "Administrador") {
       return res.status(403).json({ erro: "Acesso negado. Usuário não é administrador." });
     }
