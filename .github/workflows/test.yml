@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Copia o arquivo .env do diretório específico para a raiz
+    # Copia o arquivo .env do diretório específico para a raiz (se necessário)
     - name: Copiar .env
       run: cp services/sistema-service/.env .env
 
@@ -25,6 +25,13 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    # Executa os testes
-    - name: Run tests
+    # Define as variáveis de ambiente diretamente a partir dos secrets do GitHub
+    - name: Set Firebase environment variables
+      run: |
+        echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
+        echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> $GITHUB_ENV
+        echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> $GITHUB_ENV
+
+    # Executa os testes com Jest
+    - name: Run Jest tests
       run: npm test
