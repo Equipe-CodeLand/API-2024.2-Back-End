@@ -1,0 +1,37 @@
+name: Run Jest Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Verifica o repositório
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Copia o arquivo .env do diretório específico para a raiz
+    - name: Copiar .env
+      run: cp services/sistema-service/.env .env
+
+    # Configura o Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+
+    # Instala as dependências
+    - name: Install dependencies
+      run: npm install
+    
+    # Cria uma instância do firebase local
+    - name: Start Firebase Emulator
+      run: npm run start:emulator
+
+    # Executa os testes
+    - name: Run tests
+      run: npm test

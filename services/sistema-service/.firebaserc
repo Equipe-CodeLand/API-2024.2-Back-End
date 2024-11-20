@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "api-tecsus-fb8bd"
-  }
+    "default": "api-tecsus-fb8bd",
+    "local": "api-tecsus-fb8bd"
+  },
+  "targets": {},
+  "etags": {}
 }
