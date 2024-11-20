@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "mysql2": "^3.11.3",
     "swagger-jsdoc": "^6.2.8",
