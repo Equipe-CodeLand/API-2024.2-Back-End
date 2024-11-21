@@ -1,20 +1,20 @@
 import request from "supertest";
 import app from "../app/app";
 
-jest.setTimeout(40000);
+jest.setTimeout(30000);
 
 describe("Testes de Integração - Rotas Protegidas", () => {
   let token: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const loginResponse = await request(app)
       .post("/login")
       .send({ email: "joao@example.com", senha: "minhasenha" });
-    token = loginResponse.body.token;
+
     if (loginResponse.status !== 200) {
       throw new Error(`Login failed with status ${loginResponse.status}`);
     }
-    expect(loginResponse.status).toBe(200);
+
     token = loginResponse.body.token;
     expect(token).toBeDefined();
   });
@@ -42,7 +42,7 @@ describe("Testes de Integração - Rotas Protegidas", () => {
     expect(response.body).toHaveProperty("id"); // Verifica se o ID foi retornado
     expect(response.body).toMatchObject(novaEstacao); // Verifica se os dados estão corretos
   });
-
+  
   it("Deve atualizar uma estação existente", async () => {
     const novaEstacao = {
       nome: "Estação para Atualizar",
