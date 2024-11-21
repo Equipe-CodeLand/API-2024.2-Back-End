@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../app/app";
 
-jest.setTimeout(60000);
+jest.setTimeout(40000);
 
 describe("Testes de Integração - Rotas Protegidas", () => {
   let token: string;
@@ -64,7 +64,6 @@ describe("Testes de Integração - Rotas Protegidas", () => {
       .send(novaEstacao);
   
     const estacaoId = criarResponse.body.id;
-    console.log("Estação criada:", criarResponse.body);
   
     // Atualizando a estação
     const estacaoAtualizada = {
@@ -84,9 +83,7 @@ describe("Testes de Integração - Rotas Protegidas", () => {
       .put(`/estacao/atualizar`)
       .set("Authorization", `Bearer ${token}`)
       .send(estacaoAtualizada);
-  
-    console.log("Resposta de Atualização:", atualizarResponse.body);
-  
+    
     // Verifique se o corpo da resposta contém os dados atualizados
     expect(estacaoAtualizada).toMatchObject({
         id: estacaoId,  
@@ -154,7 +151,7 @@ describe("Testes de Integração - Rotas Protegidas", () => {
     expect(excluirResponse.status).toBe(204); // Verifica se a exclusão foi bem-sucedida
   });
 
-  afterAll((done) => {
-    done();
+  afterAll(async () => {
+    console.log("Testes concluídos. Finalizando...");
   });
 });
