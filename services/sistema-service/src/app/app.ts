@@ -25,9 +25,16 @@ app.use(router);
 
 app.use('/backup', backupRouter);
 
-app.listen(PORT, () => {
+// Inicia o servidor e lida com eventos de término
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Documentação disponível em http://localhost:${PORT}/api-docs`);
 });
 
-export default app;
+// Habilita o fechamento adequado do servidor em caso de término do processo
+server.on('close', () => {
+  console.log('Servidor fechado');
+});
+
+// Exports para testes e uso de outras partes do código
+export { app, server };
