@@ -1,7 +1,6 @@
 {
   "scripts": {
-    "test": "jest --detectOpenHandles
-"
+    "test": "jest --detectOpenHandles"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.10.0",
