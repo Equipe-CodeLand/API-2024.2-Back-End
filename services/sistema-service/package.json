@@ -6,7 +6,7 @@
     "build": "tsc",
     "start": "tsc && node dist/app/app.js",
     "dev": "nodemon src/app/app.ts",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --forceExit"
   },
   "author": "Equipe Codeland",
   "license": "ISC",

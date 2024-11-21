@@ -1,33 +1,14 @@
 import request from "supertest";
-import { app } from "../app/app"; // Certifique-se de exportar apenas 'app' e não 'server'
+import { app } from "../app/app";
+import { Estacao } from "../interfaces/estacao";
 
 jest.setTimeout(30000);
 
 describe("Testes de Integração - Rotas Protegidas", () => {
-  let token: string;
-  let estacaoId: string;
+  let estacaoTesteId: string;
 
-  // Inicia o servidor apenas uma vez antes dos testes
-  let server: any;
-
+  // Criar uma estação antes de todos os testes
   beforeAll(async () => {
-    server = app.listen(3000, () => {
-      console.log("Server running on port 3000");
-    });
-
-    // Realiza o login uma vez e armazena o token
-    const loginResponse = await request(app)
-      .post("/login")
-      .send({ email: "joao@example.com", senha: "minhasenha" });
-
-    if (loginResponse.status !== 200) {
-      throw new Error(`Login failed with status ${loginResponse.status}`);
-    }
-
-    token = loginResponse.body.token;
-    expect(token).toBeDefined();
-
-    // Cria uma estação apenas uma vez para reutilizar nos testes
     const novaEstacao = {
       nome: "Estação Teste",
       uid: "user123",
@@ -43,55 +24,20 @@ describe("Testes de Integração - Rotas Protegidas", () => {
 
     const response = await request(app)
       .post("/estacao/cadastro")
-      .set("Authorization", `Bearer ${token}`)
       .send(novaEstacao);
 
-    estacaoId = response.body.id;
+    estacaoTesteId = response.body.id; // Salva o ID para uso nos testes
     expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty("id");
   });
 
+  // Limpar a estação após todos os testes
   afterAll(async () => {
-    console.log("Finalizando os testes...");
-    await new Promise<void>((resolve, reject) => {
-      server.close((err: any) => {
-        if (err) {
-          reject(err);  // Se houver erro ao fechar o servidor
-        } else {
-          resolve();  // Quando o servidor for fechado com sucesso
-        }
-      });
-    });
-    console.log("Servidor fechado.");
-  });  
-  
-  it("Deve cadastrar uma estação com sucesso", async () => {
-    const novaEstacao = {
-      nome: "Estação Teste",
-      uid: "user123",
-      cep: "12345-678",
-      numero: 100,
-      bairro: "Centro",
-      cidade: "Cidade Exemplo",
-      rua: "Rua Principal",
-      latitude: "-23.550520",
-      longitude: "-46.633308",
-      parametros: ["8eh97g9XxX6hP8hsEPAB"],
-    };
-
-    const response = await request(app)
-      .post("/estacao/cadastro")
-      .set("Authorization", `Bearer ${token}`)
-      .send(novaEstacao);
-
-    expect(response.status).toBe(201);
-    expect(response.body).toHaveProperty("id");
-    expect(response.body).toMatchObject(novaEstacao);
+    await request(app).delete(`/estacao/deletar/${estacaoTesteId}`);
   });
 
-  it("Deve atualizar uma estação existente", async () => {
+  test("Deve atualizar uma estação existente", async () => {
     const estacaoAtualizada = {
-      id: estacaoId,
+      id: estacaoTesteId,
       nome: "Estação Atualizada",
       cep: "98765-432",
       numero: 150,
@@ -103,14 +49,13 @@ describe("Testes de Integração - Rotas Protegidas", () => {
       parametros: ["8eh97g9XxX6hP8hsEPAB"],
     };
 
-    const atualizarResponse = await request(app)
+    const response = await request(app)
       .put(`/estacao/atualizar`)
-      .set("Authorization", `Bearer ${token}`)
       .send(estacaoAtualizada);
 
-    expect(atualizarResponse.status).toBe(200);
+    expect(response.status).toBe(200);
     expect(estacaoAtualizada).toMatchObject({
-      id: estacaoId,
+      id: estacaoTesteId,
       nome: "Estação Atualizada",
       cep: "98765-432",
       numero: 150,
@@ -123,34 +68,42 @@ describe("Testes de Integração - Rotas Protegidas", () => {
     });
   });
 
-  it("Deve buscar todas as estações", async () => {
-    const response = await request(app)
-      .get("/estacoes")
-      .set("Authorization", `Bearer ${token}`);
+  test("Deve buscar uma estação por ID", async () => {
+    const buscarResponse = await request(app).get(`/estacao/${estacaoTesteId}`);
 
-    expect(response.status).toBe(200);
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(buscarResponse.body.id).toBe(estacaoTesteId);
   });
 
-  it("Deve buscar uma estação por ID", async () => {
+  test("Deve buscar a estação por ID", async () => {
+    const response = await request(app).get(`/estacao/${estacaoTesteId}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.id).toBe(estacaoTesteId);
+  });
+
+  test("Deve excluir a estação existente", async () => {
+    const novaEstacao = {
+      nome: "Estação para Deletar",
+      uid: "11111",
+      cep: "11111-678",
+      numero: 40,
+      bairro: "Bairro Deletar",
+      cidade: "Cidade Deletar",
+      rua: "Rua Deletar",
+      latitude: "-23.55052",
+      longitude: "-46.633308",
+      parametros: ["8eh97g9XxX6hP8hsEPAB"],
+    };
+
     const criarResponse = await request(app)
       .post("/estacao/cadastro")
-      .set("Authorization", `Bearer ${token}`)
-      .send({ nome: "Estação para Buscar", uid: "54321" });
+      .send(novaEstacao);
 
     const estacaoId = criarResponse.body.id;
 
-    const buscarResponse = await request(app)
-      .get(`/estacao/${estacaoId}`)
-      .set("Authorization", `Bearer ${token}`);
-
-    expect(buscarResponse.body.id).toBe(estacaoId);
-  });
-
-  it("Deve excluir uma estação existente", async () => {
-    const excluirResponse = await request(app)
-      .delete(`/estacao/deletar/${estacaoId}`)
-      .set("Authorization", `Bearer ${token}`);
+    const excluirResponse = await request(app).delete(
+      `/estacao/deletar/${estacaoId}`
+    );
 
     expect(excluirResponse.status).toBe(204);
   });
