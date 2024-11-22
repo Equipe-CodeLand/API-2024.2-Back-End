@@ -451,7 +451,7 @@ router.delete('/estacao/deletar/:id', EstacaoController.deletarEstacao);
  *       500:
  *         description: Erro ao cadastrar alerta
  */
-router.post('/alerta/cadastro', verificarAdmin, AlertaController.cadastrarAlerta);
+router.post('/alerta/cadastro', AlertaController.cadastrarAlerta);
 
 
 /**
@@ -509,7 +509,7 @@ router.get('/alertas', AlertaController.obterAlertas);
  *       500:
  *         description: Erro ao atualizar alerta.
  */
-router.put("/alerta/atualizar/:id", verificarAdmin, AlertaController.atualizarAlerta);
+router.put("/alerta/atualizar/:id", AlertaController.atualizarAlerta);
 
 /**
  * @swagger
@@ -533,7 +533,7 @@ router.put("/alerta/atualizar/:id", verificarAdmin, AlertaController.atualizarAl
  *       500:
  *         description: Erro ao deletar alerta.
  */
-router.delete('/alerta/deletar/:id', verificarAdmin, AlertaController.deletarAlerta);
+router.delete('/alerta/deletar/:id', AlertaController.deletarAlerta);
 
 // Rotas do CRUD de notificação
 /**

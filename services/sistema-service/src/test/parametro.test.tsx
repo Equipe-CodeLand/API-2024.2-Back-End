@@ -54,7 +54,7 @@ describe("Testes de Integração - Parâmetros", () => {
       sigla: "TEMP",
     };
 
-    const response = await request(app)
+    await request(app)
       .put("/parametro/atualizar")
       .send(parametroAtualizado);
 

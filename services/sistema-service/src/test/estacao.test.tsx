@@ -39,7 +39,6 @@ describe("Testes de Integração - Rotas Protegidas", () => {
   // Limpar a estação após todos os testes
   afterAll(async () => {
     await request(app).delete(`/estacao/deletar/${estacaoTesteId}`);
-
   });
 
   test("Deve atualizar uma estação existente", async () => {
@@ -56,7 +55,7 @@ describe("Testes de Integração - Rotas Protegidas", () => {
       parametros: ["8eh97g9XxX6hP8hsEPAB"],
     };
 
-    const response = await request(app)
+    await request(app)
       .put(`/estacao/atualizar`)
       .send(estacaoAtualizada);
 
