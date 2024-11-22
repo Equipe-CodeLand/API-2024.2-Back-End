@@ -9,5 +9,8 @@ module.exports = {
     setupFiles: ['dotenv/config'],
     testEnvironment: 'node',
     transformIgnorePatterns: ['/node_modules/'],
+    maxWorkers: 1,
+    runInBand: true,
+    forceExit: true,
   };
   

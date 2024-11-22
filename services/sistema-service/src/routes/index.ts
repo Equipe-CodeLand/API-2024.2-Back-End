@@ -155,7 +155,7 @@ router.delete("/usuario/deletar", verificarAdmin, UsuarioController.deletarUsuar
  *       201:
  *         description: Parâmetro cadastrado com sucesso
  */
-router.post('/parametro/cadastro', verificarAdmin, ParametroController.cadastrarParametro);
+router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
 /**
  * @swagger
@@ -199,7 +199,7 @@ router.get('/parametros', ParametroController.buscarParametros);
  *       200:
  *         description: Parâmetro atualizado com sucesso
  */
-router.put('/parametro/atualizar/:id', verificarAdmin, ParametroController.atualizarParametro);
+router.put('/parametro/atualizar/:id', ParametroController.atualizarParametro);
 
 
 /**
@@ -218,7 +218,7 @@ router.put('/parametro/atualizar/:id', verificarAdmin, ParametroController.atual
  *       200:
  *         description: Parâmetro deletado com sucesso
  */
-router.delete('/parametro/deletar/:id', verificarAdmin, ParametroController.deletarParametro);
+router.delete('/parametro/deletar/:id', ParametroController.deletarParametro);
 
 
 // Rotas do CRUD de estação

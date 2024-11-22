@@ -20,5 +20,8 @@ module.exports = {
     coverageDirectory: "coverage",
     testTimeout: 30000,
     setupFiles: ['dotenv/config'],
+    maxWorkers: 1,
+    runInBand: true,
+    forceExit: true,
   };
   

@@ -25,16 +25,12 @@ app.use(router);
 
 app.use('/backup', backupRouter);
 
-// Inicia o servidor e lida com eventos de término
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Documentação disponível em http://localhost:${PORT}/api-docs`);
-});
-
-// Habilita o fechamento adequado do servidor em caso de término do processo
-server.on('close', () => {
-  console.log('Servidor fechado');
-});
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Documentação disponível em http://localhost:${PORT}/api-docs`);
+  });
+}
 
 // Exports para testes e uso de outras partes do código
-export { app, server };
+export { app };

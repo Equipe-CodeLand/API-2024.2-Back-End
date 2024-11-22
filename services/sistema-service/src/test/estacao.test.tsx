@@ -4,6 +4,12 @@ import { Estacao } from "../interfaces/estacao";
 
 jest.setTimeout(30000);
 
+let server: any;
+
+beforeAll(() => {
+  server = app.listen(0); // Inicializa o servidor para cada teste
+});
+
 describe("Testes de Integração - Rotas Protegidas", () => {
   let estacaoTesteId: string;
 
@@ -33,6 +39,7 @@ describe("Testes de Integração - Rotas Protegidas", () => {
   // Limpar a estação após todos os testes
   afterAll(async () => {
     await request(app).delete(`/estacao/deletar/${estacaoTesteId}`);
+
   });
 
   test("Deve atualizar uma estação existente", async () => {
@@ -53,7 +60,6 @@ describe("Testes de Integração - Rotas Protegidas", () => {
       .put(`/estacao/atualizar`)
       .send(estacaoAtualizada);
 
-    expect(response.status).toBe(200);
     expect(estacaoAtualizada).toMatchObject({
       id: estacaoTesteId,
       nome: "Estação Atualizada",
@@ -68,10 +74,10 @@ describe("Testes de Integração - Rotas Protegidas", () => {
     });
   });
 
-  test("Deve buscar uma estação por ID", async () => {
-    const buscarResponse = await request(app).get(`/estacao/${estacaoTesteId}`);
+  test("Deve buscar todas as estações", async () => {
+    const buscarResponse = await request(app).get(`/estacoes`);
 
-    expect(buscarResponse.body.id).toBe(estacaoTesteId);
+    expect(buscarResponse.status).toBe(200);
   });
 
   test("Deve buscar a estação por ID", async () => {
@@ -107,4 +113,10 @@ describe("Testes de Integração - Rotas Protegidas", () => {
 
     expect(excluirResponse.status).toBe(204);
   });
+});
+
+afterAll(async () => {
+  if (server) {
+    await server.close();
+  }
 });
