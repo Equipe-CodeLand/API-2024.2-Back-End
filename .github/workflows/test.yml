@@ -2,37 +2,37 @@ name: Run Jest Tests
 
 on:
   push:
-  pull_request:
+    branches:
+      - develop
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-    # Verifica o repositório
-    - name: Checkout code
-      uses: actions/checkout@v3
+      # Verifica o repositório
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Copia o arquivo .env do diretório específico para a raiz (se necessário)
-    - name: Copiar .env
-      run: cp services/sistema-service/.env .env
+      # Copia o arquivo .env do diretório específico para a raiz (se necessário)
+      - name: Copiar .env
+        run: cp services/sistema-service/.env .env
 
-    # Configura o Node.js
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
+      # Configura o Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
 
-    # Instala as dependências
-    - name: Install dependencies
-      run: npm install
+      # Instala as dependências
+      - name: Install dependencies
+        run: npm install
 
-    # Define as variáveis de ambiente diretamente a partir dos secrets do GitHub
-    - name: Set Firebase environment variables
-      run: |
-        echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
-        echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> $GITHUB_ENV
-        echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> $GITHUB_ENV
+      # Define as variáveis de ambiente diretamente a partir dos secrets do GitHub
+      - name: Set Firebase environment variables
+        run: |
+          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> $GITHUB_ENV
+          echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> $GITHUB_ENV
+          echo "FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}" >> $GITHUB_ENV
 
-    # Executa os testes com Jest
-    - name: Run Jest tests
-      run: npm test
-      continue-on-error: true
+      # Executa os testes com Jest
+      - name: Run Jest tests
+        run: npm test
