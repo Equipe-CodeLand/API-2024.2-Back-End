@@ -10,25 +10,25 @@ export default class ParametroController {
   // Função para cadastrar um novo parâmetro
   static async cadastrarParametro(req: Request, res: Response) {
     try {
-      const dados: Parametro = req.body;
-      const novoParametro = await colecaoParametros.add(dados); // Adiciona um novo documento na coleção 'Parametros'
-
-      // Gravar novo parâmetro no Firestore
+      const dados = req.body;
+      const novoParametro = colecaoParametros.doc(); // Gerar ID automático
+  
       await novoParametro.set({
+        ...dados,
         id: novoParametro.id,
-        nome: dados.nome,
-        unidade: dados.unidade,
-        fator: dados.fator,
-        offset: dados.offset,
-        descricao: dados.descricao,
-        sigla: dados.sigla,
-        criadoEm: TimestampFormatado(),
-        atualizadoEm: TimestampFormatado(),
-      })
-
-      res.status(201).json({ novoParametro });
-    } catch (erro) {
-        res.status(500).json({ erro: "Falha ao cadastrar parâmetro" });
+        criadoEm: new Date(),
+        atualizadoEm: new Date(),
+      });
+  
+      res.status(201).json({
+        novoParametro: {
+          id: novoParametro.id,
+          ...dados,
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao cadastrar parâmetro:", error);
+      res.status(500).json({ error: "Erro ao cadastrar parâmetro" });
     }
   }
 

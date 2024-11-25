@@ -155,7 +155,7 @@ router.delete("/usuario/deletar", verificarAdmin, UsuarioController.deletarUsuar
  *       201:
  *         description: Parâmetro cadastrado com sucesso
  */
-router.post('/parametro/cadastro', verificarAdmin, ParametroController.cadastrarParametro);
+router.post('/parametro/cadastro', ParametroController.cadastrarParametro);
 
 /**
  * @swagger
@@ -199,7 +199,7 @@ router.get('/parametros', ParametroController.buscarParametros);
  *       200:
  *         description: Parâmetro atualizado com sucesso
  */
-router.put('/parametro/atualizar/:id', verificarAdmin, ParametroController.atualizarParametro);
+router.put('/parametro/atualizar/:id', ParametroController.atualizarParametro);
 
 
 /**
@@ -218,7 +218,7 @@ router.put('/parametro/atualizar/:id', verificarAdmin, ParametroController.atual
  *       200:
  *         description: Parâmetro deletado com sucesso
  */
-router.delete('/parametro/deletar/:id', verificarAdmin, ParametroController.deletarParametro);
+router.delete('/parametro/deletar/:id', ParametroController.deletarParametro);
 
 
 // Rotas do CRUD de estação
@@ -265,7 +265,7 @@ router.delete('/parametro/deletar/:id', verificarAdmin, ParametroController.dele
  *       500:
  *         description: Falha ao cadastrar estação
  */
-router.post('/estacao/cadastro', verificarAdmin, EstacaoController.cadastrarEstacao);
+router.post('/estacao/cadastro', EstacaoController.cadastrarEstacao);
 
 /**
  * @swagger
@@ -354,7 +354,7 @@ router.get('/estacao/:id', EstacaoController.buscarEstacaoPorId);
  *       500:
  *         description: Falha ao atualizar estação
  */
-router.put("/estacao/atualizar", verificarAdmin, EstacaoController.atualizarEstacao);
+router.put("/estacao/atualizar",  EstacaoController.atualizarEstacao);
 
 /**
  * @swagger
@@ -375,7 +375,7 @@ router.put("/estacao/atualizar", verificarAdmin, EstacaoController.atualizarEsta
  *       500:
  *         description: Falha ao excluir estação
  */
-router.delete('/estacao/deletar/:id', verificarAdmin, EstacaoController.deletarEstacao);
+router.delete('/estacao/deletar/:id', EstacaoController.deletarEstacao);
 
 // Rotas do CRUD de alertas
 /**
@@ -451,7 +451,7 @@ router.delete('/estacao/deletar/:id', verificarAdmin, EstacaoController.deletarE
  *       500:
  *         description: Erro ao cadastrar alerta
  */
-router.post('/alerta/cadastro', verificarAdmin, AlertaController.cadastrarAlerta);
+router.post('/alerta/cadastro', AlertaController.cadastrarAlerta);
 
 
 /**
@@ -509,7 +509,7 @@ router.get('/alertas', AlertaController.obterAlertas);
  *       500:
  *         description: Erro ao atualizar alerta.
  */
-router.put("/alerta/atualizar/:id", verificarAdmin, AlertaController.atualizarAlerta);
+router.put("/alerta/atualizar/:id", AlertaController.atualizarAlerta);
 
 /**
  * @swagger
@@ -533,7 +533,7 @@ router.put("/alerta/atualizar/:id", verificarAdmin, AlertaController.atualizarAl
  *       500:
  *         description: Erro ao deletar alerta.
  */
-router.delete('/alerta/deletar/:id', verificarAdmin, AlertaController.deletarAlerta);
+router.delete('/alerta/deletar/:id', AlertaController.deletarAlerta);
 
 // Rotas do CRUD de notificação
 /**

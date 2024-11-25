@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "commonjs",
+    "target": "ES2021",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "react"  // Adicione essa linha
+  },
+  "include": [
+    "services/sistema-service/src/**/*.ts",
+    "services/sistema-service/src/test/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
