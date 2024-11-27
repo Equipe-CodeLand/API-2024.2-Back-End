@@ -2,16 +2,13 @@ import { Request, Response, NextFunction } from "express";
 import admin from "firebase-admin";
 import { getIdToken } from "../config";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: admin.auth.DecodedIdToken;
-    }
-  }
+// Extende a interface Request do Express para incluir a propriedade user
+interface CustomRequest extends Request {
+  user?: admin.auth.DecodedIdToken;
 }
 
 // Middleware para verificar se o usuário é Administrador
-export const verificarAdmin = async (req: Request, res: Response, next: NextFunction) => {
+export const verificarAdmin = async (req: CustomRequest, res: Response, next: NextFunction) => {
   // Extrai o token da autorização Bearer
   const token = req.headers.authorization?.split(" ")[1];
   console.log("Token recebido:", token);
@@ -30,7 +27,7 @@ export const verificarAdmin = async (req: Request, res: Response, next: NextFunc
     const decodedToken = await admin.auth().verifyIdToken(idToken);
     console.log("Token decodificado:", decodedToken);
 
-    // Verifica se o perfil do usuário é "Administrador
+    // Verifica se o perfil do usuário é "Administrador"
     if (decodedToken.perfil !== "Administrador") {
       return res.status(403).json({ erro: "Acesso negado. Usuário não é administrador." });
     }

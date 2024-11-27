@@ -102,7 +102,7 @@ async function downloadBackup(backupFileName: string) {
   }
 
   // Caminho onde o arquivo será salvo localmente
-  const backupFilePath = path.join(backupDir, 'all_namespaces', 'all_documents',backupFileName);
+  const backupFilePath = path.join(backupDir, 'all_namespaces', 'all_documents', backupFileName);
 
   try {
     // Baixar o arquivo do Google Cloud Storage
@@ -177,7 +177,7 @@ async function restoreFirestore(backupFileName: string) {
 
     // Iterar sobre as coleções e restaurar os dados
     for (const collectionName in backupData) {
-      if (backupData.hasOwnProperty(collectionName)) {
+      if (Object.prototype.hasOwnProperty.call(backupData, collectionName)) {
         const collection = backupData[collectionName];
 
         for (const document of collection) {
