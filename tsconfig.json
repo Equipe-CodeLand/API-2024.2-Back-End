@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "./dist_root",  // Altere para não conflitar com a pasta dist dentro de sistema-service
     "module": "commonjs",
     "target": "ES2021",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
-    "jsx": "react"  // Adicione essa linha
+    "jsx": "react"
   },
   "include": [
     "services/sistema-service/src/**/*.ts",

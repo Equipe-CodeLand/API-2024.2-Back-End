@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "./dist", // Aqui é onde os arquivos .js serão gerados
     "module": "commonjs",
     "target": "ES2021",
     "esModuleInterop": true,

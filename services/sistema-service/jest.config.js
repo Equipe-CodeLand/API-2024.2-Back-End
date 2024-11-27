@@ -8,6 +8,7 @@ module.exports = {
     moduleNameMapper: {
       "\\.(css|scss)$": "identity-obj-proxy",
       "\\.(jpg|jpeg|png|gif|webp|svg)$": "<rootDir>/__mocks__/fileMock.js",
+      "^@mocks/(.*)$": "<rootDir>/services/sistema-service/src/test/__mocks__/$1",
     },
     testEnvironment: "node",
     testMatch: ["**/__tests__/**/*.+(ts|tsx|js)", "**/?(*.)+(spec|test).+(ts|tsx|js)"],
